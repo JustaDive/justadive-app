@@ -66,13 +66,13 @@ body {
 }
 .login-divider::before,.login-divider::after { content:''; flex:1; height:1px; background:var(--border); }
 .login-input {
-  width:100%; background:var(--bg-input); border:1px solid var(--border);
-  border-radius:8px; padding:10px 12px; color:var(--text);
+  width:100%; background:#ffffff; border:1px solid var(--border);
+  border-radius:8px; padding:10px 12px; color:#1a1a1a;
   font-family:inherit; font-size:0.82rem; outline:none;
   transition:all 0.2s; margin-bottom:8px;
 }
 .login-input:focus { border-color:var(--blue); box-shadow:0 0 0 2px var(--blue-glow); }
-.login-input::placeholder { color:var(--text-muted); }
+.login-input::placeholder { color:#999; }
 .btn-email {
   width:100%; background:var(--gradient); border:none; border-radius:10px;
   padding:11px; color:#fff; font-size:0.8rem; font-weight:800;
@@ -172,8 +172,8 @@ label {
   text-transform: uppercase; color: var(--text-muted);
 }
 input, select, textarea {
-  background: var(--bg-input); border: 1px solid var(--border);
-  border-radius: 8px; padding: 9px 11px; color: var(--text);
+  background: #ffffff; border: 1px solid var(--border);
+  border-radius: 8px; padding: 9px 11px; color: #1a1a1a;
   font-family: inherit; font-size: 0.82rem;
   transition: all 0.2s; outline: none; width: 100%;
 }
@@ -181,9 +181,9 @@ input:focus, select:focus, textarea:focus {
   border-color: var(--blue);
   box-shadow: 0 0 0 2px var(--blue-glow);
 }
-input::placeholder, textarea::placeholder { color: var(--text-muted); }
+input::placeholder, textarea::placeholder { color: #999; }
 select { cursor: pointer; }
-select option { background: var(--bg-card); color: var(--text); }
+select option { background: #fff; color: #1a1a1a; }
 .btn-primary {
   background: var(--gradient);
   border:none; border-radius:10px; padding:12px 24px;
