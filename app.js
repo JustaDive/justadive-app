@@ -155,6 +155,18 @@ function showApp(user) {
   });
   renderQuizCategories();
   switchTab('certs');
+
+  // Dodaj demo certyfikat jeśli brak
+  certsCol.get().then(snap => {
+    if (snap.empty) {
+      certsCol.add({
+        agency:'PSAI', level:'Open Water Diver',
+        number:'OW-12345', date:'2026-04-20',
+        name:'Damian Biniarz',
+        instructor:'Piotr Urbański #I-3095'
+      });
+    }
+  });
 }
 
 function hideApp() {
