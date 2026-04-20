@@ -68,25 +68,25 @@
 
   <!-- Tabs: kursant -->
   <div class="tabs-bar" id="tabs-student">
-    <button class="tab active" onclick="switchTab('log')">📋 Loguj</button>
-    <button class="tab" onclick="switchTab('history')">🌊 Nurki</button>
-    <button class="tab" onclick="switchTab('certs')">🎓 Certyfikaty</button>
+    <button class="tab active" onclick="switchTab('certs')">🎓 Certyfikaty</button>
     <button class="tab" onclick="switchTab('quiz')">🧠 Quiz</button>
+    <button class="tab" onclick="switchTab('log')">📋 Loguj</button>
+    <button class="tab" onclick="switchTab('history')">🌊 Nurki</button>
     <button class="tab" onclick="switchTab('shop')">🛒 Sklep</button>
   </div>
 
   <!-- Tabs: instruktor -->
   <div class="tabs-bar" id="tabs-instructor" style="display:none;">
-    <button class="tab active" onclick="switchTab('log')">📋 Loguj</button>
-    <button class="tab" onclick="switchTab('history')">🌊 Nurki</button>
-    <button class="tab" onclick="switchTab('certs')">🎓 Certyfikaty</button>
+    <button class="tab active" onclick="switchTab('certs')">🎓 Certyfikaty</button>
     <button class="tab" onclick="switchTab('quiz')">🧠 Quiz</button>
+    <button class="tab" onclick="switchTab('log')">📋 Loguj</button>
+    <button class="tab" onclick="switchTab('history')">🌊 Nurki</button>
     <button class="tab" onclick="switchTab('shop')">🛒 Sklep</button>
     <button class="tab" onclick="switchTab('manage')">👥 Kursanci</button>
   </div>
 
   <!-- Log Dive -->
-  <div class="panel active" id="panel-log">
+  <div class="panel" id="panel-log">
     <div class="card">
       <div class="card-title">🧭 Nowy <span class="accent">Wpis nurkowy</span></div>
       <div class="form-grid">
@@ -139,7 +139,7 @@
   </div>
 
   <!-- Certyfikaty -->
-  <div class="panel" id="panel-certs">
+  <div class="panel active" id="panel-certs">
     <div class="card" style="margin-bottom:12px;">
       <div class="card-title">🎓 Cyfrowe <span class="accent">Karty Uprawnień</span></div>
       <p style="font-size:0.76rem;color:var(--text-dim);margin-bottom:0;">Twoje certyfikaty nurkowe w jednym miejscu.</p>

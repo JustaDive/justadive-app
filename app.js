@@ -154,7 +154,7 @@ function showApp(user) {
     if (document.getElementById('panel-certs').classList.contains('active')) renderCerts();
   });
   renderQuizCategories();
-  switchTab('log');
+  switchTab('certs');
 }
 
 function hideApp() {
@@ -380,35 +380,31 @@ function renderCerts() {
     return;
   }
   grid.innerHTML = certs.map(c => {
-    const isPSAI = (c.agency||'').toUpperCase().includes('PSAI')||( c.agency||'').toUpperCase().includes('PSA');
+    const agency = (c.agency||'PSAI').toUpperCase();
     return `<div>
-      <!-- Front -->
       <div class="cert-card">
         <div class="cert-front">
-          <div class="cert-front-top">
-            <div class="cert-front-level">${c.level||'Diver'}</div>
-            <img src="JustaDive/PSAI logo bez tła.png" alt="PSAI" class="cert-front-logo">
-          </div>
+          <div class="cert-front-level">${c.level||'Diver'}</div>
+          <div class="cert-front-logo-wrap"><img src="JustaDive/PSAI logo bez tła.png" alt="PSAI" class="cert-front-logo"></div>
           <div class="cert-front-bottom">Professional Scuba Association International</div>
         </div>
       </div>
-      <!-- Back -->
       <div class="cert-card" style="margin-top:8px;">
         <div class="cert-back">
-          <div class="cert-back-header">${isPSAI?'PSAI':c.agency||''} ${c.level||'Certyfikat'}</div>
+          <div class="cert-back-header">${agency} ${c.level||'Certyfikat'}</div>
           <div class="cert-back-body">
             <img src="JustaDive/PSAI logo bez tła.png" alt="PSAI" class="cert-back-logo">
             <div class="cert-back-info">
               <div class="cert-back-name">${c.name||'—'}</div>
               <div class="cert-back-detail">
-                ${c.number?'<div>Certification # <strong>'+c.number+'</strong></div>':''}
-                ${c.date?'<div>'+fmtDate(c.date)+'</div>':''}
-                ${c.instructor?'<div>Instructor: <strong>'+c.instructor+'</strong></div>':''}
+                ${c.number?'Certification # <strong>'+c.number+'</strong><br>':''}
+                ${c.date?fmtDate(c.date)+'<br>':''}
+                ${c.instructor?'Instructor: <strong>'+c.instructor+'</strong>':''}
               </div>
             </div>
           </div>
           <div class="cert-back-footer">PSA INTERNATIONAL</div>
-          <div class="cert-back-iso">ISO 49001 Certified / www.psa.pl</div>
+          <div class="cert-back-iso">ISO 49001 Certified / www.psai.pl</div>
         </div>
       </div>
       ${userRole==='instructor'?'<div class="cert-actions"><button class="btn-delete" onclick="deleteCert(\''+c.id+'\')">🗑 Usuń</button></div>':''}
