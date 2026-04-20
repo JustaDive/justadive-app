@@ -217,6 +217,10 @@
       <div class="form-group"><label>Data uzyskania</label><input type="date" id="cf-date"></div>
       <div class="form-group full"><label>Imię i nazwisko</label><input type="text" id="cf-name" placeholder="Jak na certyfikacie"></div>
       <div class="form-group full"><label>Instruktor</label><input type="text" id="cf-instructor" placeholder="Imię instruktora"></div>
+      <div class="form-group full"><label>Zdjęcie kursanta</label>
+        <label class="import-label" style="margin-top:4px;">📷 Wybierz zdjęcie<input type="file" id="cf-photo" accept="image/*" onchange="previewCertPhoto(event)" style="display:none;"></label>
+        <img id="cf-photo-preview" style="display:none;width:60px;height:75px;object-fit:cover;border-radius:6px;margin-top:6px;border:1px solid var(--border);">
+      </div>
     </div>
     <button class="btn-primary" onclick="saveCert()" style="margin-top:12px;">💾 ZAPISZ CERTYFIKAT</button>
   </div>

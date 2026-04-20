@@ -179,7 +179,8 @@ function showApp(user) {
         agency:'PSAI', level:'Open Water Diver',
         number:'OW-12345', date:'2026-04-20',
         name:'Damian Biniarz',
-        instructor:'Piotr Urbański #I-3095'
+        instructor:'Piotr Urbański #I-3095',
+        photo:''
       });
     }
   });
@@ -430,6 +431,7 @@ function renderCerts() {
                 ${c.instructor?'Instructor: <strong>'+c.instructor+'</strong>':''}
               </div>
             </div>
+            ${c.photo?'<img src="'+c.photo+'" class="cert-back-photo">':''}
           </div>
           <div class="cert-back-footer">PSA INTERNATIONAL</div>
           <div class="cert-back-iso">ISO 49001 Certified / www.psai.pl</div>
@@ -440,10 +442,39 @@ function renderCerts() {
   }).join('');
 }
 
+let certPhotoBase64 = '';
+
+function previewCertPhoto(event) {
+  const file = event.target.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = function(e) {
+    const img = new Image();
+    img.onload = function() {
+      const canvas = document.createElement('canvas');
+      const max = 200;
+      let w = img.width, h = img.height;
+      if (w > h) { h = Math.round(h * max / w); w = max; }
+      else { w = Math.round(w * max / h); h = max; }
+      canvas.width = w; canvas.height = h;
+      canvas.getContext('2d').drawImage(img, 0, 0, w, h);
+      certPhotoBase64 = canvas.toDataURL('image/jpeg', 0.7);
+      const preview = document.getElementById('cf-photo-preview');
+      preview.src = certPhotoBase64;
+      preview.style.display = 'block';
+    };
+    img.src = e.target.result;
+  };
+  reader.readAsDataURL(file);
+}
+
 function openCertModal() {
   ['cf-level','cf-number','cf-name','cf-instructor'].forEach(id=>document.getElementById(id).value='');
   document.getElementById('cf-agency').value='PSAI';
   document.getElementById('cf-date').value='';
+  document.getElementById('cf-photo').value='';
+  document.getElementById('cf-photo-preview').style.display='none';
+  certPhotoBase64 = '';
   const sel = document.getElementById('cf-student');
   sel.innerHTML = students.map(s=>'<option value="'+s.uid+'">'+(s.name||s.email)+'</option>').join('');
   document.getElementById('cert-modal').classList.add('open');
@@ -462,6 +493,7 @@ async function saveCert() {
     date:document.getElementById('cf-date').value,
     name:document.getElementById('cf-name').value.trim(),
     instructor:document.getElementById('cf-instructor').value.trim(),
+    photo: certPhotoBase64 || '',
     studentUid
   });
   closeCertModalDirect(); showToast('✅ Certyfikat dodany!');
