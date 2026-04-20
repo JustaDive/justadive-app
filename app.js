@@ -176,7 +176,7 @@ function showApp(user) {
     brandName.innerHTML = '<span class="just">Just</span> <span class="a">a</span> <span class="dive">dive</span>';
     brandSub.textContent = 'Twoja Szkoła Nurkowania';
   } else if (currentSchoolLogo === 'dive-app') {
-    brandLogo.src = 'JustaDive/logotyp negatyw.png';
+    brandLogo.src = 'austronaut_logo.jpg';
     brandName.textContent = 'Dive App';
     brandSub.textContent = 'Dive Logbook';
   } else if (currentSchoolLogo) {
