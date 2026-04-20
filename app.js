@@ -111,11 +111,27 @@ auth.onAuthStateChanged(async user => {
 async function loadUserProfile(user) {
   userDocRef = db.collection('users').doc(user.uid);
   const snap = await userDocRef.get();
+  const email = (user.email||'').toLowerCase();
   if (!snap.exists) {
-    await userDocRef.set({ email:user.email, name:user.displayName||user.email, role:'student', enabledQuizzes:[], createdAt:firebase.firestore.FieldValue.serverTimestamp() });
-    userRole = 'student'; myEnabledQuizzes = [];
+    const isInstructor = email === 'szkuni@gmail.com';
+    await userDocRef.set({
+      email: user.email,
+      name: user.displayName || user.email,
+      role: isInstructor ? 'instructor' : 'student',
+      enabledQuizzes: isInstructor ? [] : Object.keys(quizData),
+      createdAt: firebase.firestore.FieldValue.serverTimestamp()
+    });
+    userRole = isInstructor ? 'instructor' : 'student';
+    myEnabledQuizzes = isInstructor ? [] : Object.keys(quizData);
   } else {
-    const d = snap.data(); userRole = d.role||'student'; myEnabledQuizzes = d.enabledQuizzes||[];
+    const d = snap.data();
+    // Jeśli Szkuni loguje się ponownie, upewnij się że ma rolę instructor
+    if (email === 'szkuni@gmail.com' && d.role !== 'instructor') {
+      await userDocRef.update({ role: 'instructor' });
+      d.role = 'instructor';
+    }
+    userRole = d.role || 'student';
+    myEnabledQuizzes = d.enabledQuizzes || [];
   }
 }
 
