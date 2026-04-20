@@ -13,6 +13,7 @@ const auth = firebase.auth();
 const googleProvider = new firebase.auth.GoogleAuthProvider();
 
 let currentUser = null, userRole = 'student', userDocRef = null;
+let currentSchoolName = '', currentSchoolLogo = '';
 let divesCol, certsCol;
 let dives = [], certs = [], students = [];
 let currentRating = 0, myEnabledQuizzes = [];
@@ -112,27 +113,50 @@ async function loadUserProfile(user) {
   userDocRef = db.collection('users').doc(user.uid);
   const snap = await userDocRef.get();
   const email = (user.email||'').toLowerCase();
+  const instructorEmails = ['szkuni@gmail.com','biuro@justadive.pl','damianbiniarz@gmail.com'];
+  const isInstructor = instructorEmails.includes(email);
+
   if (!snap.exists) {
-    const isInstructor = email === 'szkuni@gmail.com' || email === 'biuro@justadive.pl';
+    const schoolData = getSchoolForEmail(email);
     await userDocRef.set({
       email: user.email,
       name: user.displayName || user.email,
       role: isInstructor ? 'instructor' : 'student',
-      enabledQuizzes: isInstructor ? [] : Object.keys(quizData),
+      enabledQuizzes: [],
+      schoolName: isInstructor ? schoolData.name : '',
+      schoolLogo: isInstructor ? schoolData.logo : '',
+      instructorUid: '',
       createdAt: firebase.firestore.FieldValue.serverTimestamp()
     });
     userRole = isInstructor ? 'instructor' : 'student';
-    myEnabledQuizzes = isInstructor ? [] : Object.keys(quizData);
+    myEnabledQuizzes = [];
+    currentSchoolName = isInstructor ? schoolData.name : '';
+    currentSchoolLogo = isInstructor ? schoolData.logo : '';
   } else {
     const d = snap.data();
-    // Jeśli Szkuni loguje się ponownie, upewnij się że ma rolę instructor
-    if ((email === 'szkuni@gmail.com' || email === 'biuro@justadive.pl') && d.role !== 'instructor') {
-      await userDocRef.update({ role: 'instructor' });
-      d.role = 'instructor';
+    if (isInstructor && d.role !== 'instructor') {
+      const schoolData = getSchoolForEmail(email);
+      await userDocRef.update({ role:'instructor', schoolName:schoolData.name, schoolLogo:schoolData.logo });
+      d.role = 'instructor'; d.schoolName = schoolData.name; d.schoolLogo = schoolData.logo;
     }
     userRole = d.role || 'student';
     myEnabledQuizzes = d.enabledQuizzes || [];
+    currentSchoolName = d.schoolName || '';
+    currentSchoolLogo = d.schoolLogo || '';
+    // Kursant: pobierz logo szkoły instruktora
+    if (userRole === 'student' && d.instructorUid) {
+      const instrSnap = await db.collection('users').doc(d.instructorUid).get();
+      if (instrSnap.exists) {
+        currentSchoolName = instrSnap.data().schoolName || '';
+        currentSchoolLogo = instrSnap.data().schoolLogo || '';
+      }
+    }
   }
+}
+
+function getSchoolForEmail(email) {
+  if (email === 'damianbiniarz@gmail.com') return { name:'Dive App', logo:'dive-app' };
+  return { name:'Just a Dive', logo:'justadive' };
 }
 
 function showApp(user) {
@@ -142,7 +166,24 @@ function showApp(user) {
   document.getElementById('user-menu').style.display = 'flex';
   const av = document.getElementById('user-avatar');
   av.src = user.photoURL||''; av.title = user.displayName||user.email||'';
-  const badge = document.getElementById('role-badge');
+
+  // Logo szkoły w headerze
+  const brandLogo = document.getElementById('brand-logo');
+  const brandName = document.getElementById('brand-name');
+  const brandSub = document.getElementById('brand-sub');
+  if (currentSchoolLogo === 'justadive') {
+    brandLogo.src = 'JustaDive/logotyp negatyw.png';
+    brandName.innerHTML = '<span class="just">Just</span> <span class="a">a</span> <span class="dive">dive</span>';
+    brandSub.textContent = 'Twoja Szkoła Nurkowania';
+  } else if (currentSchoolLogo === 'dive-app') {
+    brandLogo.src = 'JustaDive/logotyp negatyw.png';
+    brandName.textContent = 'Dive App';
+    brandSub.textContent = 'Dive Logbook';
+  } else if (currentSchoolLogo) {
+    brandLogo.src = currentSchoolLogo;
+    brandName.textContent = currentSchoolName || 'Szkoła Nurkowa';
+    brandSub.textContent = '';
+  }  const badge = document.getElementById('role-badge');
   if (userRole==='instructor') {
     badge.textContent='🏅 Instruktor'; badge.className='role-badge instructor';
     document.getElementById('tabs-student').style.display='none';
@@ -506,7 +547,7 @@ async function deleteCert(id) {
 
 // ─── Instructor: students ───
 async function loadStudents() {
-  const snap = await db.collection('users').where('role','==','student').get();
+  const snap = await db.collection('users').where('instructorUid','==',currentUser.uid).get();
   students = snap.docs.map(doc=>({uid:doc.id,...doc.data()}));
 }
 async function addStudent() {
@@ -514,9 +555,12 @@ async function addStudent() {
   if (!email){showToast('⚠️ Podaj email kursanta');return;}
   const snap = await db.collection('users').where('email','==',email).get();
   if (snap.empty){showToast('⚠️ Nie znaleziono — kursant musi się najpierw zarejestrować.');return;}
+  const studentDoc = snap.docs[0];
+  // Przypisz kursanta do tego instruktora
+  await db.collection('users').doc(studentDoc.id).update({ instructorUid: currentUser.uid });
   document.getElementById('add-student-email').value='';
   await loadStudents(); renderStudents();
-  showToast('✅ Kursant jest w systemie!');
+  showToast('✅ Kursant przypisany!');
 }
 function renderStudents() {
   const el = document.getElementById('students-list');
