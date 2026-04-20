@@ -1,0 +1,23 @@
+<svg width="512" height="512" viewBox="0 0 512 512" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <rect width="512" height="512" rx="108" fill="#080d13"/>
+  <!-- Diver mask -->
+  <ellipse cx="256" cy="210" rx="90" ry="70" fill="#0f1923" stroke="#2dd4bf" stroke-width="6"/>
+  <ellipse cx="256" cy="210" rx="70" ry="50" fill="url(#v)" stroke="#1e293b" stroke-width="4"/>
+  <ellipse cx="236" cy="198" rx="28" ry="16" fill="rgba(255,255,255,0.12)" transform="rotate(-8 236 198)"/>
+  <!-- Snorkel -->
+  <path d="M346 210 Q360 210 360 180 Q360 140 340 120" stroke="#2dd4bf" stroke-width="8" fill="none" stroke-linecap="round"/>
+  <circle cx="340" cy="116" r="10" fill="#2dd4bf" opacity="0.8"/>
+  <!-- Bubbles -->
+  <circle cx="370" cy="90" r="16" fill="none" stroke="#2dd4bf" stroke-width="5" opacity="0.6"/>
+  <circle cx="395" cy="60" r="10" fill="none" stroke="#8b5cf6" stroke-width="4" opacity="0.4"/>
+  <circle cx="350" cy="55" r="7" fill="none" stroke="#2dd4bf" stroke-width="3" opacity="0.3"/>
+  <!-- Text: JAD -->
+  <text x="256" y="340" text-anchor="middle" font-family="Inter,system-ui,sans-serif" font-size="52" font-weight="900" fill="#e2e8f0" letter-spacing="6">JUST A</text>
+  <text x="256" y="400" text-anchor="middle" font-family="Inter,system-ui,sans-serif" font-size="72" font-weight="900" fill="#2dd4bf" letter-spacing="8">DIVE</text>
+  <defs>
+    <linearGradient id="v" x1="186" y1="160" x2="326" y2="260">
+      <stop offset="0%" stop-color="#1a3a5c"/>
+      <stop offset="100%" stop-color="#0a1628"/>
+    </linearGradient>
+  </defs>
+</svg>
