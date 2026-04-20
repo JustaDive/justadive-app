@@ -144,37 +144,39 @@
       <div class="card-title">🎓 Cyfrowe <span class="accent">Karty Uprawnień</span></div>
       <p style="font-size:0.76rem;color:var(--text-dim);margin-bottom:0;">Twoje certyfikaty nurkowe w jednym miejscu.</p>
     </div>
-    <div class="certs-grid" id="certs-grid">
-      <!-- Demo card -->
-      <div>
-        <div class="cert-card">
-          <div class="cert-front">
-            <div class="cert-front-level">Open Water Diver</div>
-            <div class="cert-front-logo-wrap"><img src="JustaDive/PSAI logo bez tła.png" alt="PSAI" class="cert-front-logo"></div>
-            <div class="cert-front-bottom">Professional Scuba Association International</div>
+    <div id="certs-demo">
+      <div class="certs-grid">
+        <div>
+          <div class="cert-card">
+            <div class="cert-front">
+              <div class="cert-front-level">Open Water Diver</div>
+              <div class="cert-front-logo-wrap"><img src="JustaDive/PSAI logo bez tła.png" alt="PSAI" class="cert-front-logo"></div>
+              <div class="cert-front-bottom">Professional Scuba Association International</div>
+            </div>
           </div>
-        </div>
-        <div class="cert-card" style="margin-top:8px;">
-          <div class="cert-back">
-            <div class="cert-back-header">PSAI Open Water Diver</div>
-            <div class="cert-back-body">
-              <img src="JustaDive/PSAI logo bez tła.png" alt="PSAI" class="cert-back-logo">
-              <div class="cert-back-info">
-                <div class="cert-back-name">Damian Biniarz</div>
-                <div class="cert-back-detail">
-                  Certification # <strong>OW-12345</strong><br>
-                  20 kwi 2026<br>
-                  Instructor: <strong>Piotr Urbański #I-3095</strong>
+          <div class="cert-card" style="margin-top:8px;">
+            <div class="cert-back">
+              <div class="cert-back-header">PSAI Open Water Diver</div>
+              <div class="cert-back-body">
+                <img src="JustaDive/PSAI logo bez tła.png" alt="PSAI" class="cert-back-logo">
+                <div class="cert-back-info">
+                  <div class="cert-back-name">Damian Biniarz</div>
+                  <div class="cert-back-detail">
+                    Certification # <strong>OW-12345</strong><br>
+                    20 kwi 2026<br>
+                    Instructor: <strong>Piotr Urbański #I-3095</strong>
+                  </div>
                 </div>
               </div>
+              <div class="cert-back-qual">Qualified to perform Open Water diving in accordance to PSAI Standards and Procedures.</div>
+              <div class="cert-back-footer">PSA INTERNATIONAL</div>
+              <div class="cert-back-iso">ISO 49001 Certified / www.psai.pl</div>
             </div>
-            <div class="cert-back-qual">Qualified to perform Open Water diving in accordance to PSAI Standards and Procedures.</div>
-            <div class="cert-back-footer">PSA INTERNATIONAL</div>
-            <div class="cert-back-iso">ISO 49001 Certified / www.psai.pl</div>
           </div>
         </div>
       </div>
     </div>
+    <div class="certs-grid" id="certs-grid"></div>
     <button class="btn-add-cert" id="btn-add-cert" onclick="openCertModal()" style="margin-top:12px;width:100%;display:none;">+ Dodaj certyfikat</button>
   </div>
 
