@@ -13,21 +13,21 @@
 }
 
 :root {
-  --bg: #0c1824;
-  --bg-card: #111f30;
-  --bg-card-hover: #162840;
-  --bg-input: #0e1a2a;
+  --bg: #101c2c;
+  --bg-card: #162a42;
+  --bg-card-hover: #1d3452;
+  --bg-input: #132338;
   --navy: #1a2744;
   --blue: #29abe2;
-  --blue-dim: rgba(41,171,226,0.1);
-  --blue-glow: rgba(41,171,226,0.15);
+  --blue-dim: rgba(41,171,226,0.12);
+  --blue-glow: rgba(41,171,226,0.18);
   --red: #e63946;
   --white: #f1f5f9;
-  --text: #d0dae6;
-  --text-dim: #7a9bb5;
-  --text-muted: #4a6a84;
-  --border: #1e3a5f;
-  --border-light: #2a4a6b;
+  --text: #dce4ed;
+  --text-dim: #8ba4bd;
+  --text-muted: #5a7a96;
+  --border: #264060;
+  --border-light: #305070;
   --danger: #e63946;
   --gradient: linear-gradient(135deg, #29abe2, #8b5cf6);
   --gold: #d4a843;
