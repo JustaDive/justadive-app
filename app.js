@@ -113,7 +113,7 @@ async function loadUserProfile(user) {
   const snap = await userDocRef.get();
   const email = (user.email||'').toLowerCase();
   if (!snap.exists) {
-    const isInstructor = email === 'szkuni@gmail.com';
+    const isInstructor = email === 'szkuni@gmail.com' || email === 'biuro@justadive.pl';
     await userDocRef.set({
       email: user.email,
       name: user.displayName || user.email,
@@ -126,7 +126,7 @@ async function loadUserProfile(user) {
   } else {
     const d = snap.data();
     // Jeśli Szkuni loguje się ponownie, upewnij się że ma rolę instructor
-    if (email === 'szkuni@gmail.com' && d.role !== 'instructor') {
+    if ((email === 'szkuni@gmail.com' || email === 'biuro@justadive.pl') && d.role !== 'instructor') {
       await userDocRef.update({ role: 'instructor' });
       d.role = 'instructor';
     }
