@@ -125,7 +125,7 @@ function getSchoolForEmail(email) {
   return { name:'Just a Dive', logo:'justadive' };
 }
 
-function showApp(user) {
+async function showApp(user) {
   document.getElementById('login-screen').style.display = 'none';
   document.getElementById('app-header').style.display = '';
   document.getElementById('app-container').style.display = '';
