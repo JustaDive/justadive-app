@@ -37,6 +37,11 @@ const QUIZ_QUESTIONS_PER_TEST = 20;
 let isRegisterMode = false;
 function signInGoogle() {
   auth.signInWithPopup(googleProvider).catch(e => {
+    // Fallback to redirect if popup blocked
+    if (e.code === 'auth/popup-blocked' || e.code === 'auth/popup-closed-by-user') {
+      auth.signInWithRedirect(googleProvider);
+      return;
+    }
     document.getElementById('login-error').textContent = e.message;
     document.getElementById('login-error').style.display = 'block';
   });
@@ -540,22 +545,22 @@ let quizState = null;
 
 async function loadQuizData() {
   quizData = {};
-  // Ładuj z Firestore
   const snap = await db.collection('quizCategories').get();
+  // Zawsze aktualizuj OWSD z najnowszymi pytaniami
+  if (typeof OWSD_QUESTIONS !== 'undefined' && OWSD_QUESTIONS.length) {
+    await db.collection('quizCategories').doc('owsd').set({
+      name:'Open Water Scuba Diver', icon:'🤿', questions: OWSD_QUESTIONS
+    });
+  }
   if (snap.empty) {
-    // Seed z defaultowych danych
     for (const [key, cat] of Object.entries(defaultQuizCategories)) {
       if (cat.questions.length) {
         await db.collection('quizCategories').doc(key).set({ name:cat.name, icon:cat.icon, questions:cat.questions });
       }
     }
-    // Załaduj ponownie
-    const snap2 = await db.collection('quizCategories').get();
-    snap2.forEach(doc => { quizData[doc.id] = doc.data(); });
-  } else {
-    snap.forEach(doc => { quizData[doc.id] = doc.data(); });
   }
-  // Dodaj puste kategorie z defaults jeśli brak
+  const snap2 = await db.collection('quizCategories').get();
+  snap2.forEach(doc => { quizData[doc.id] = doc.data(); });
   for (const [key, cat] of Object.entries(defaultQuizCategories)) {
     if (!quizData[key]) quizData[key] = { name:cat.name, icon:cat.icon, questions:[] };
   }

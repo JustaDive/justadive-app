@@ -1,5 +1,5 @@
 // ─── Quiz: OWSD questions parsed from OWSD.txt ───
-// Correct answers based on standard PSAI Open Water Scuba Diver curriculum
+// Correct answers verified by instructor Piotr Urbański
 const OWSD_QUESTIONS = [
 {q:'Aby zapewnić bezpieczeństwo i dobrą zabawę podczas nurkowania, nurek powinien:',a:['Polegać na partnerze, aby ten podejmował wszystkie decyzje związane z nurkowaniem','Robić dokładnie to samo, co robią wszyscy inni nurkowie','Planować swoje nurkowanie i nurkować zgodnie z planem','Żadne z powyższych'],c:2},
 {q:'Podczas przebywania pod wodą, przedmioty wydają się być:',a:['Mniejsze i dalej niż na lądzie','Większe i bliżej niż na lądzie','Tej samej wielkości i w tej samej odległości, co na lądzie','Wszystkie powyższe odpowiedzi, w zależności od głębokości'],c:1},
@@ -19,12 +19,12 @@ const OWSD_QUESTIONS = [
 {q:'Dlaczego wszyscy nurkowie powinni prowadzić „dive log" – rejestr nurkowań?',a:['Aby udokumentować doświadczenie nurka','Aby rejestrować konfiguracje sprzętu do planowania','Aby pomóc określić poziom umiejętności nurka','Wszystkie z powyższych odpowiedzi'],c:3},
 {q:'Warstwy wody o różnej temperaturze są określane mianem:',a:['Termokliny','Termogłębokości','Termosfery','Wypływy wód głębinowych'],c:0},
 {q:'Najważniejszym aspektem systemu balastu jest fakt, iż:',a:['System może utrzymać co najmniej 14kg','System jest zintegrowany z BCD','System można łatwo zrzucić','Żadne z powyższych'],c:2},
-{q:'System balastu powinien być zrzucony:',a:['Tylko wtedy, jeśli Asystent Instruktora pozwoli','Tylko, jako ostatnia deska ratunku w sytuacji kryzysowej','Tylko wtedy, kiedy łatwo go będzie później odnaleźć','Żadne z powyższych'],c:3},
+{q:'System balastu powinien być zrzucony:',a:['Tylko wtedy, jeśli Asystent Instruktora pozwoli','Tylko, jako ostatnia deska ratunku w sytuacji kryzysowej','Tylko wtedy, kiedy łatwo go będzie później odnaleźć','Żadne z powyższych'],c:1},
 {q:'Podczas awaryjnego wynurzenia nurek powinien:',a:['Próbować przywrócić neutralną pływalność poprzez spuszczenie powietrza z BCD','Rozłożyć ręce i nogi w celu spowolnienia wynurzenia','Wydychać równomiernie powietrze w celu uniknięcia zatoru','Wszystkie z powyższych odpowiedzi'],c:3},
 {q:'Dla niedoświadczonych nurków, ilu osobowe zespoły nurkowe są zalecane?',a:['Zespół trzy lub czteroosobowy','Nurkowanie samodzielne','Zespół pięcioosobowy lub większy','Wszystkie z powyższych odpowiedzi'],c:0},
 {q:'Nurek złapany przez prąd odpływowy powinien:',a:['Płynąć z całej siły wbrew prądowi','Płynąć w poprzek prądu (prostopadle), aby uciec odpływowi','Zasygnalizować partnerowi nurkowemu prośbę o pomoc','Sprawdzić na kompasie kierunek prądu'],c:1},
 {q:'Dlaczego zanurzalny manometr (SPG) jest niezbędny?',a:['Ponieważ jest wodoodporny','Ponieważ wskazuje ile powietrza nurek potrzebuje','Ponieważ pokazuje ile powietrza nurkowi zostało podczas nurkowania','Wszystkie z powyższych odpowiedzi'],c:2},
-{q:'Jak często butla powinna być poddawana inspekcji wizualnej?',a:['Co najmniej raz w roku','Za każdym razem, kiedy w butli nie ma powietrza pod ciśnieniem','Co najmniej raz w roku lub za każdym razem, kiedy w butli nie ma powietrza','Jest to konieczne tylko wtedy, kiedy wnętrze butli uległo korozji'],c:2},
+{q:'Jak często butla powinna być poddawana inspekcji wizualnej?',a:['Co najmniej raz w roku','Za każdym razem, kiedy w butli nie ma powietrza pod ciśnieniem','Co najmniej raz w roku lub za każdym razem, kiedy w butli nie ma powietrza','Jest to konieczne tylko wtedy, kiedy wnętrze butli uległo korozji'],c:0},
 {q:'Jak często butla powinna być poddawana testowi hydrostatycznemu?',a:['Co najmniej raz na dwa do pięciu lat','Jeśli butla została uszkodzona','Co najmniej raz na dwa do pięciu lat lub jeśli butla została uszkodzona','Jest to konieczne tylko wtedy, kiedy butla uległa korozji'],c:2},
 {q:'Jaka jest odpowiednia metoda oddychania?',a:['Wolny głęboki wdech, po którym następuje wolny pełny wydech','Głęboki wdech trzymany tak długo jak tylko jest to możliwe','Oddychanie szybsze niż normalnie','Metoda oddychania nie ma znaczenia'],c:0},
 {q:'Kto może przerwać nurkowanie?',a:['Każdy, z każdego powodu','Twój partner, ale tylko wtedy, kiedy ma trudności','Asystent Instruktora, tylko wtedy, kiedy zauważy niebezpieczeństwa','Kapitan łodzi, dając sygnał do odwrotu'],c:0},
@@ -38,11 +38,11 @@ const OWSD_QUESTIONS = [
 {q:'Skutki Narkozy Azotowej mogą być wyeliminowane poprzez:',a:['Użycie środków pobudzających, jak na przykład kawę','Unikanie nadmiernego wysiłku podczas nurkowania','Medytacja przed nurkowaniem','Żadna z powyższych odpowiedzi'],c:3},
 {q:'Jak oblicza się czas denny?',a:['Zliczając tylko czas spędzony na maksymalnej głębokości','Zliczając cały czas aż do momentu rozpoczęcia wynurzenia','Zliczając cały czas pod wodą oprócz przystanków bezpieczeństwa','Zliczając cały czas spędzony pod wodą'],c:1},
 {q:'Nurek nurkuje na 16m przez 50 minut. Jaka będzie Grupa Powtórzeniowa?',a:['F','E','D','Żadna z powyższych'],c:0},
-{q:'Ten sam nurek ma przerwę powierzchniową 75 minut. W jakiej grupie będzie przed drugim nurkowaniem?',a:['D','C','B','Żadna z powyższych'],c:1},
+{q:'Ten sam nurek ma przerwę powierzchniową 75 minut. W jakiej grupie będzie przed drugim nurkowaniem?',a:['D','C','B','Żadna z powyższych'],c:2},
 {q:'Ten sam nurek nurkuje ponownie na 16m przez 30 min. Jaki będzie czas zalegającego azotu?',a:['17 minut','21 minut','11 minut','42 minuty'],c:0},
-{q:'Jak długie może być drugie nurkowanie bez przekroczenia limitów bezdekompresyjnych?',a:['34 minuty','50 minut','45 minut','42 minuty'],c:3},
-{q:'Jaka będzie grupa powtórzeniowa po drugim nurkowaniu?',a:['H','I','J','F'],c:0},
-{q:'Obydwa nurkowania mogą być scharakteryzowane jako konserwatywne, ponieważ:',a:['Głębokości zaokrąglono w górę do kolejnej większej głębokości','Pod koniec drugiego nurkowania wciąż była możliwość 13 min nurkowania','Obydwie powyższe odpowiedzi','Żadna z powyższych odpowiedzi'],c:2},
+{q:'Jak długie może być drugie nurkowanie bez przekroczenia limitów bezdekompresyjnych?',a:['34 minuty','50 minut','45 minut','42 minuty'],c:0},
+{q:'Jaka będzie grupa powtórzeniowa po drugim nurkowaniu?',a:['H','I','J','F'],c:3},
+{q:'Obydwa nurkowania mogą być scharakteryzowane jako konserwatywne, ponieważ:',a:['Głębokości zaokrąglono w górę do kolejnej większej głębokości','Pod koniec drugiego nurkowania wciąż była możliwość 13 min nurkowania','Obydwie powyższe odpowiedzi','Żadna z powyższych odpowiedzi'],c:0},
 {q:'Nurek powinien przeprowadzić trzyminutowy przystanek bezpieczeństwa na 5m podczas obydwu nurkowań.',a:['Prawda','Fałsz'],c:0},
 {q:'Nurkowanie na większych wysokościach wymaga:',a:['Tabel nurkowych zmodyfikowanych dla takich wysokości','Komputerów nurkowych dostrojonych do używania na wysokościach','Obydwie powyższe odpowiedzi','Żadna z powyższych odpowiedzi'],c:2},
 {q:'Zatrucie CO może być skutkiem:',a:['Nieodpowiednich smarów użytych w kompresorze','Rury wydechowej silnika skierowanej w stronę wlotu kompresora','Używania zniszczonego lub źle konserwowanego kompresora','Wszystkie z powyższych odpowiedzi'],c:3},
