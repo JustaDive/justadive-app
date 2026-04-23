@@ -20,7 +20,10 @@ let currentRating = 0, myEnabledQuizzes = [];
 let unsubDives = null, unsubCerts = null;
 let editingStudentId = null;
 
-document.getElementById('f-date').valueAsDate = new Date();
+document.addEventListener('DOMContentLoaded', function() {
+  var fd = document.getElementById('f-date');
+  if (fd) fd.valueAsDate = new Date();
+});
 
 // ─── Quiz Data — loaded from Firestore, seeded from JS files ───
 const defaultQuizCategories = {
@@ -36,14 +39,17 @@ const QUIZ_QUESTIONS_PER_TEST = 20;
 // ─── Auth ───
 let isRegisterMode = false;
 function signInGoogle() {
-  auth.signInWithPopup(googleProvider).catch(e => {
-    // Fallback to redirect if popup blocked
-    if (e.code === 'auth/popup-blocked' || e.code === 'auth/popup-closed-by-user') {
+  var errEl = document.getElementById('login-error');
+  errEl.style.display = 'none';
+  auth.signInWithPopup(googleProvider).then(function(result) {
+    // Success - onAuthStateChanged will handle it
+  }).catch(function(e) {
+    if (e.code === 'auth/popup-blocked') {
       auth.signInWithRedirect(googleProvider);
       return;
     }
-    document.getElementById('login-error').textContent = e.message;
-    document.getElementById('login-error').style.display = 'block';
+    errEl.textContent = e.code + ': ' + e.message;
+    errEl.style.display = 'block';
   });
 }
 function toggleAuthMode() {
