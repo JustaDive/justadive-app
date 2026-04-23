@@ -65,7 +65,16 @@ function handleEmailAuth(e) {
   const errEl = document.getElementById('login-error');
   errEl.style.display = 'none';
   (isRegisterMode ? auth.createUserWithEmailAndPassword(email, pass) : auth.signInWithEmailAndPassword(email, pass))
-    .catch(err => { errEl.textContent = err.message; errEl.style.display = 'block'; });
+    .catch(err => {
+      var msg = 'Zły login lub hasło';
+      if (err.code === 'auth/user-not-found' || err.code === 'auth/invalid-credential') msg = 'Nie znaleziono konta z tym emailem';
+      else if (err.code === 'auth/wrong-password') msg = 'Nieprawidłowe hasło';
+      else if (err.code === 'auth/email-already-in-use') msg = 'Konto z tym emailem już istnieje';
+      else if (err.code === 'auth/weak-password') msg = 'Hasło za słabe (min. 6 znaków)';
+      else if (err.code === 'auth/invalid-email') msg = 'Nieprawidłowy adres email';
+      errEl.textContent = msg;
+      errEl.style.display = 'block';
+    });
   return false;
 }
 function logOut() { auth.signOut(); }
