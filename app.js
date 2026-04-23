@@ -22,61 +22,16 @@ let editingStudentId = null;
 
 document.getElementById('f-date').valueAsDate = new Date();
 
-// ─── Quiz Data (placeholder — szwagier dostarczy pytania) ───
-const quizData = {
-  ow: { name:'Open Water Diver', icon:'🤿', questions:[
-    {q:'Jaka jest najważniejsza zasada nurkowania?',a:['Nigdy nie wstrzymuj oddechu','Nurkuj jak najgłębiej','Nurkuj sam','Ignoruj dekompresję'],c:0},
-    {q:'Co oznacza skrót BCD?',a:['Buoyancy Control Device','Basic Compression Diver','Bottom Current Detector','Breathing Control Device'],c:0},
-    {q:'Jaki gaz oddychamy najczęściej podczas nurkowania rekreacyjnego?',a:['Czysty tlen','Nitrox 50%','Sprężone powietrze','Heliox'],c:2},
-    {q:'Co się dzieje z objętością gazu gdy schodzimy głębiej?',a:['Zwiększa się','Nie zmienia się','Zmniejsza się','Zależy od temperatury'],c:2},
-    {q:'Co to jest "safety stop"?',a:['Zatrzymanie na 5m na 3 min','Zatrzymanie na dnie','Zatrzymanie na powierzchni','Zatrzymanie na 15m'],c:0},
-    {q:'Jaki jest maksymalny limit głębokości dla nurka OWD?',a:['12m','18m','30m','40m'],c:1},
-    {q:'Co powoduje choroba dekompresyjna?',a:['Zbyt szybkie wynurzanie — pęcherzyki azotu','Zbyt wolne zanurzanie','Zimna woda','Zbyt dużo tlenu'],c:0},
-    {q:'Jak wyrównujemy ciśnienie w uszach?',a:['Przełykanie lub manewr Valsalvy','Krzyczenie pod wodą','Szybkie wynurzanie','Nie trzeba wyrównywać'],c:0},
-    {q:'Co to jest "buddy system"?',a:['Nurkowanie w parach','System nawigacji','Typ komputera nurkowego','Metoda dekompresji'],c:0},
-    {q:'Jakie prawo opisuje zależność ciśnienia i objętości gazu?',a:['Prawo Dalton','Prawo Boyle-Mariotte','Prawo Henry','Prawo Archimedesa'],c:1}
-  ]},
-  aowd: { name:'Advanced OWD', icon:'🌊', questions:[
-    {q:'Na jakiej głębokości ciśnienie wynosi 2 ATA?',a:['5m','10m','20m','30m'],c:1},
-    {q:'Prawo Henry\'ego dotyczy:',a:['Rozpuszczalności gazów w cieczach','Pływalności','Objętości gazów','Temperatury'],c:0},
-    {q:'Światło traci kolor czerwony na głębokości ok.:',a:['1m','5m','15m','30m'],c:1},
-    {q:'Dźwięk pod wodą rozchodzi się:',a:['Wolniej niż w powietrzu','Tak samo','Szybciej niż w powietrzu','Nie rozchodzi się'],c:2},
-    {q:'Ile wynosi ciśnienie na głębokości 30m?',a:['2 ATA','3 ATA','4 ATA','5 ATA'],c:2},
-    {q:'Prawo Archimedesa opisuje:',a:['Ciśnienie gazów','Siłę wyporu','Rozpuszczalność gazów','Prędkość dźwięku'],c:1},
-    {q:'Azot pod ciśnieniem może powodować:',a:['Narkozę azotową','Lepszy wzrok','Szybsze pływanie','Nic'],c:0},
-    {q:'Jaka jest prędkość bezpiecznego wynurzania?',a:['3m/min','9-18m/min','30m/min','Jak najszybciej'],c:1}
-  ]},
-  rescue: { name:'Rescue Diver', icon:'🆘', questions:[
-    {q:'Co robisz gdy skończy ci się powietrze?',a:['Sygnalizujesz buddy i dzielisz powietrze','Wynurzasz się jak najszybciej','Zdejmujesz sprzęt','Czekasz na dnie'],c:0},
-    {q:'Objawy narkozy azotowej to:',a:['Euforia, dezorientacja, spowolnienie','Ból głowy','Zimno','Głód'],c:0},
-    {q:'Po nurkowaniu nie powinno się latać samolotem przez:',a:['2 godziny','12-24 godziny','3 dni','Tydzień'],c:1},
-    {q:'Sygnał "OK" pod wodą to:',a:['Kciuk w górę','Kółko z palców nad głową','Machanie ręką','Dwie ręce w górę'],c:1},
-    {q:'Sygnał "coś nie tak" pod wodą to:',a:['Kciuk w dół','Płaska dłoń kołysana na boki','Pięść','Dwie ręce skrzyżowane'],c:1},
-    {q:'Pierwsza pomoc przy chorobie dekompresyjnej:',a:['Tlen 100% i transport do komory hiperbarycznej','Zimny prysznic','Ponowne zanurzenie','Aspiryna'],c:0},
-    {q:'Kiedy NIE powinieneś nurkować?',a:['Gdy jesteś przeziębiony lub po alkoholu','Gdy jest pochmurno','Gdy woda jest ciepła','Gdy jest weekend'],c:0},
-    {q:'Plan nurkowania powinien zawierać:',a:['Tylko głębokość','Głębokość, czas, gaz, buddy, plan awaryjny','Tylko lokalizację','Tylko typ nurkowania'],c:1}
-  ]},
-  equipment: { name:'Sprzęt nurkowy', icon:'⚙️', questions:[
-    {q:'Do czego służy automat oddechowy (regulator)?',a:['Redukuje ciśnienie powietrza z butli','Mierzy głębokość','Kontroluje pływalność','Oświetla drogę'],c:0},
-    {q:'Co to jest octopus?',a:['Zapasowy automat oddechowy','Typ maski','Komputer nurkowy','Rodzaj płetw'],c:0},
-    {q:'Butla nurkowa najczęściej ma pojemność:',a:['5 litrów','10-12 litrów','20 litrów','50 litrów'],c:1},
-    {q:'Manometr (SPG) pokazuje:',a:['Głębokość','Ciśnienie w butli','Temperaturę wody','Czas nurkowania'],c:1},
-    {q:'Pianka nurkowa chroni przed:',a:['Tylko zimnem','Zimnem i otarciami','Rekinami','Prądem morskim'],c:1},
-    {q:'Komputer nurkowy monitoruje:',a:['Tylko głębokość','Głębokość, czas, limity dekompresji','Tylko czas','Temperaturę powietrza'],c:1},
-    {q:'Jak często należy serwisować automat oddechowy?',a:['Co 5 lat','Co rok lub wg producenta','Nigdy','Tylko po awarii'],c:1},
-    {q:'Do czego służy SMB (Surface Marker Buoy)?',a:['Sygnalizacja pozycji na powierzchni','Oświetlenie','Nawigacja podwodna','Kontrola pływalności'],c:0}
-  ]},
-  nitrox: { name:'Nitrox', icon:'🔬', questions:[
-    {q:'Co to jest Nitrox?',a:['Mieszanka azotu i tlenu z wyższym % O2','Czysty tlen','Hel z tlenem','Sprężone powietrze'],c:0},
-    {q:'Jaki jest typowy procent tlenu w EANx32?',a:['21%','32%','36%','40%'],c:1},
-    {q:'Główna zaleta nurkowania na Nitrox to:',a:['Dłuższe czasy bezdekompresyjne','Większa głębokość','Tańszy gaz','Lepsza widoczność'],c:0},
-    {q:'Jakie jest główne ryzyko przy nurkowaniu na Nitrox?',a:['Toksyczność tlenowa','Narkoza','Hipotermia','Brak ryzyka'],c:0},
-    {q:'MOD dla EANx32 przy ppO2 1.4 to ok.:',a:['20m','33m','40m','56m'],c:1},
-    {q:'Co oznacza skrót MOD?',a:['Maximum Operating Depth','Minimum Oxygen Dose','Mixed Oxygen Delivery','Maximum Oxygen Depth'],c:0},
-    {q:'Przed nurkowaniem na Nitrox należy:',a:['Sprawdzić analizę gazu w butli','Nic specjalnego','Wypić kawę','Zanurkować najpierw na powietrzu'],c:0},
-    {q:'ppO2 oznacza:',a:['Ciśnienie parcjalne tlenu','Procent tlenu','Ciśnienie w butli','Prędkość przepływu'],c:0}
-  ]}
+// ─── Quiz Data — loaded from Firestore, seeded from JS files ───
+const defaultQuizCategories = {
+  owsd: { name:'Open Water Scuba Diver', icon:'🤿', questions: typeof OWSD_QUESTIONS!=='undefined' ? OWSD_QUESTIONS : [] },
+  aowd: { name:'Advanced OWD', icon:'🌊', questions:[] },
+  rescue: { name:'Rescue Diver', icon:'🆘', questions:[] },
+  equipment: { name:'Sprzęt nurkowy', icon:'⚙️', questions:[] },
+  nitrox: { name:'Nitrox', icon:'🔬', questions:[] }
 };
+let quizData = {};
+const QUIZ_QUESTIONS_PER_TEST = 20;
 
 // ─── Auth ───
 let isRegisterMode = false;
@@ -210,21 +165,9 @@ function showApp(user) {
     certs = snap.docs.map(doc=>({id:doc.id,...doc.data()}));
     if (document.getElementById('panel-certs').classList.contains('active')) renderCerts();
   });
+  await loadQuizData();
   renderQuizCategories();
   switchTab('certs');
-
-  // Dodaj demo certyfikat jeśli brak
-  certsCol.get().then(snap => {
-    if (snap.empty) {
-      certsCol.add({
-        agency:'PSAI', level:'Open Water Diver',
-        number:'OW-12345', date:'2026-04-20',
-        name:'Damian Biniarz',
-        instructor:'Piotr Urbański #I-3095',
-        photo:''
-      });
-    }
-  });
 }
 
 function hideApp() {
@@ -594,15 +537,101 @@ async function saveStudentQuizzes() {
 
 // ─── Quiz ───
 let quizState = null;
-function renderQuizCategories() {
-  document.getElementById('quiz-categories').innerHTML = Object.entries(quizData).map(([k,cat])=>{
-    const ok = userRole==='instructor'||myEnabledQuizzes.includes(k);
-    return '<div class="quiz-cat '+(ok?'':'disabled')+'" '+(ok?'onclick="startQuiz(\''+k+'\')"':'')+'><span class="quiz-cat-icon">'+cat.icon+'</span><div class="quiz-cat-name">'+cat.name+'</div>'+(ok?'':'<div class="quiz-locked">🔒 Zablokowany</div>')+'</div>';
-  }).join('');
+
+async function loadQuizData() {
+  quizData = {};
+  // Ładuj z Firestore
+  const snap = await db.collection('quizCategories').get();
+  if (snap.empty) {
+    // Seed z defaultowych danych
+    for (const [key, cat] of Object.entries(defaultQuizCategories)) {
+      if (cat.questions.length) {
+        await db.collection('quizCategories').doc(key).set({ name:cat.name, icon:cat.icon, questions:cat.questions });
+      }
+    }
+    // Załaduj ponownie
+    const snap2 = await db.collection('quizCategories').get();
+    snap2.forEach(doc => { quizData[doc.id] = doc.data(); });
+  } else {
+    snap.forEach(doc => { quizData[doc.id] = doc.data(); });
+  }
+  // Dodaj puste kategorie z defaults jeśli brak
+  for (const [key, cat] of Object.entries(defaultQuizCategories)) {
+    if (!quizData[key]) quizData[key] = { name:cat.name, icon:cat.icon, questions:[] };
+  }
 }
+
+function renderQuizCategories() {
+  const el = document.getElementById('quiz-categories');
+  let html = Object.entries(quizData).map(([k,cat])=>{
+    const ok = userRole==='instructor'||myEnabledQuizzes.includes(k);
+    const cnt = (cat.questions||[]).length;
+    return '<div class="quiz-cat '+(ok?'':'disabled')+'" '+(ok&&cnt?'onclick="startQuiz(\''+k+'\')"':'')+'><span class="quiz-cat-icon">'+cat.icon+'</span><div class="quiz-cat-name">'+cat.name+'</div><div style="font-size:0.55rem;color:var(--text-muted);margin-top:2px;">'+cnt+' pytań</div>'+(ok?'':'<div class="quiz-locked">🔒 Zablokowany</div>')+'</div>';
+  }).join('');
+  // Instruktor: przycisk upload
+  if (userRole==='instructor') {
+    html += '<label class="quiz-cat" style="cursor:pointer;"><span class="quiz-cat-icon">📂</span><div class="quiz-cat-name">Załaduj pytania (TXT)</div><input type="file" accept=".txt" onchange="uploadQuizTxt(event)" style="display:none;"></label>';
+  }
+  el.innerHTML = html;
+}
+
+async function uploadQuizTxt(event) {
+  const file = event.target.files[0];
+  if (!file) return;
+  const text = await file.text();
+  const catKey = file.name.replace(/\.txt$/i,'').toLowerCase().replace(/\s+/g,'_');
+  const questions = parseTxtQuestions(text);
+  if (!questions.length) { showToast('⚠️ Nie znaleziono pytań w pliku'); return; }
+  const catName = catKey.toUpperCase().replace(/_/g,' ');
+  await db.collection('quizCategories').doc(catKey).set({
+    name: catName, icon:'📝', questions: questions
+  }, { merge:true });
+  quizData[catKey] = { name:catName, icon:'📝', questions };
+  renderQuizCategories();
+  showToast('✅ Załadowano '+questions.length+' pytań do kategorii '+catName);
+  event.target.value = '';
+}
+
+function parseTxtQuestions(text) {
+  const questions = [];
+  const lines = text.split('\n').map(l=>l.trim()).filter(l=>l);
+  let i = 0;
+  while (i < lines.length) {
+    // Szukaj pytania (zaczyna się od numeru)
+    const qMatch = lines[i].match(/^\d+[\.\)\t]\s*(.+)/);
+    if (!qMatch) { i++; continue; }
+    const qText = qMatch[1];
+    const answers = [];
+    let correct = 0;
+    i++;
+    // Zbierz odpowiedzi
+    while (i < lines.length) {
+      // Odpowiedź w tej samej linii (np. "a. Prawda    b. Fałsz")
+      const multiMatch = lines[i].match(/^a[\.\)]\s*(.+?)\s+b[\.\)]\s*(.+)$/i);
+      if (multiMatch) {
+        answers.push(multiMatch[1].trim(), multiMatch[2].trim());
+        i++;
+        break;
+      }
+      const aMatch = lines[i].match(/^([a-d])[\.\)\t]\s*(.+)/i);
+      if (!aMatch) break;
+      answers.push(aMatch[2].trim());
+      i++;
+    }
+    if (answers.length >= 2) {
+      questions.push({ q:qText, a:answers, c:correct });
+    }
+  }
+  return questions;
+}
+
 function startQuiz(k) {
-  const cat=quizData[k], qs=[...cat.questions].sort(()=>Math.random()-0.5);
-  quizState={catKey:k,catName:cat.name,questions:qs,current:0,score:0,total:qs.length};
+  const cat = quizData[k];
+  if (!cat || !cat.questions || !cat.questions.length) { showToast('⚠️ Brak pytań w tej kategorii'); return; }
+  // Losuj pytania z puli
+  const pool = [...cat.questions].sort(()=>Math.random()-0.5);
+  const qs = pool.slice(0, Math.min(QUIZ_QUESTIONS_PER_TEST, pool.length));
+  quizState = { catKey:k, catName:cat.name, questions:qs, current:0, score:0, total:qs.length };
   renderQuizQuestion();
 }
 function renderQuizQuestion() {

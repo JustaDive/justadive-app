@@ -1,0 +1,37 @@
+<svg width="512" height="512" viewBox="0 0 512 512" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <rect width="512" height="512" rx="108" fill="#080d13"/>
+  <!-- Helmet -->
+  <circle cx="256" cy="200" r="102" fill="#e8ecf0" stroke="#2a2a2a" stroke-width="8"/>
+  <ellipse cx="222" cy="166" rx="42" ry="30" fill="white" opacity="0.35"/>
+  <!-- Visor -->
+  <rect x="170" y="168" width="172" height="94" rx="26" fill="url(#v)" stroke="#2a2a2a" stroke-width="6"/>
+  <ellipse cx="220" cy="198" rx="34" ry="18" fill="rgba(255,255,255,0.15)" transform="rotate(-8 220 198)"/>
+  <!-- Ears -->
+  <circle cx="154" cy="210" r="18" fill="#b0b8c0" stroke="#2a2a2a" stroke-width="6"/>
+  <circle cx="358" cy="210" r="18" fill="#b0b8c0" stroke="#2a2a2a" stroke-width="6"/>
+  <!-- Neck -->
+  <rect x="218" y="290" width="76" height="36" rx="14" fill="#d0d4d8" stroke="#2a2a2a" stroke-width="5"/>
+  <!-- Body -->
+  <rect x="182" y="316" width="148" height="110" rx="40" fill="#e8ecf0" stroke="#2a2a2a" stroke-width="8"/>
+  <!-- Chest panel -->
+  <rect x="216" y="336" width="80" height="60" rx="12" fill="white" stroke="#2a2a2a" stroke-width="5"/>
+  <circle cx="244" cy="360" r="8" fill="#555"/>
+  <circle cx="268" cy="360" r="8" fill="#555"/>
+  <circle cx="244" cy="384" r="6" fill="#888"/>
+  <!-- Belt -->
+  <rect x="182" y="410" width="148" height="20" rx="8" fill="#ef4444"/>
+  <!-- Arms -->
+  <ellipse cx="166" cy="360" rx="26" ry="36" fill="#e8ecf0" stroke="#2a2a2a" stroke-width="7"/>
+  <ellipse cx="346" cy="360" rx="26" ry="36" fill="#e8ecf0" stroke="#2a2a2a" stroke-width="7"/>
+  <!-- Bubbles -->
+  <circle cx="380" cy="120" r="20" fill="none" stroke="#2dd4bf" stroke-width="6" opacity="0.8"/>
+  <circle cx="410" cy="80" r="13" fill="none" stroke="#2dd4bf" stroke-width="5" opacity="0.5"/>
+  <circle cx="432" cy="50" r="8" fill="none" stroke="#8b5cf6" stroke-width="4" opacity="0.4"/>
+  <defs>
+    <linearGradient id="v" x1="170" y1="168" x2="342" y2="262">
+      <stop offset="0%" stop-color="#c9a84c"/>
+      <stop offset="50%" stop-color="#8a7530"/>
+      <stop offset="100%" stop-color="#6b5a28"/>
+    </linearGradient>
+  </defs>
+</svg>
