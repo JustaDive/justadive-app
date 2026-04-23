@@ -617,25 +617,27 @@ function parseTxtQuestions(text) {
   const lines = text.split('\n').map(l=>l.trim()).filter(l=>l);
   let i = 0;
   while (i < lines.length) {
-    // Szukaj pytania (zaczyna się od numeru)
     const qMatch = lines[i].match(/^\d+[\.\)\t]\s*(.+)/);
     if (!qMatch) { i++; continue; }
     const qText = qMatch[1];
     const answers = [];
     let correct = 0;
     i++;
-    // Zbierz odpowiedzi
     while (i < lines.length) {
-      // Odpowiedź w tej samej linii (np. "a. Prawda    b. Fałsz")
-      const multiMatch = lines[i].match(/^a[\.\)]\s*(.+?)\s+b[\.\)]\s*(.+)$/i);
+      // Odpowiedzi w jednej linii: "a. Prawda    b. Fałsz"
+      const multiMatch = lines[i].match(/^\*?a[\.\)]\s*(.+?)\s+\*?b[\.\)]\s*(.+)$/i);
       if (multiMatch) {
+        const aStarred = lines[i].match(/^\*a[\.\)]/i);
+        const bStarred = lines[i].match(/\s+\*b[\.\)]/i);
         answers.push(multiMatch[1].trim(), multiMatch[2].trim());
+        if (bStarred) correct = 1;
         i++;
         break;
       }
-      const aMatch = lines[i].match(/^([a-d])[\.\)\t]\s*(.+)/i);
+      const aMatch = lines[i].match(/^(\*?)([a-d])[\.\)\t]\s*(.+)/i);
       if (!aMatch) break;
-      answers.push(aMatch[2].trim());
+      if (aMatch[1] === '*') correct = answers.length;
+      answers.push(aMatch[3].trim());
       i++;
     }
     if (answers.length >= 2) {
