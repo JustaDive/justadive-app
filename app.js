@@ -660,7 +660,7 @@ function renderQuizCategories() {
       '</div>';
   }).join('');
   if (isPriv) {
-    html += '<label class="quiz-cat" style="cursor:pointer;"><span class="quiz-cat-icon">📂</span><div class="quiz-cat-name">Załaduj pytania (TXT)</div><input type="file" accept=".txt" onchange="uploadQuizTxt(event)" style="display:none;"></label>';
+    html += '<div class="quiz-cat" onclick="openUploadQuiz()" style="cursor:pointer;"><span class="quiz-cat-icon">📂</span><div class="quiz-cat-name">Załaduj pytania (TXT)</div></div>';
     html += '<div class="quiz-cat" onclick="showQuizResults()" style="cursor:pointer;"><span class="quiz-cat-icon">📊</span><div class="quiz-cat-name">Wyniki kursantów</div></div>';
   }
   el.innerHTML = html;
@@ -672,6 +672,30 @@ async function deleteQuizCategory(key) {
   quizData[key] = defaultQuizCategories[key] || {name:key,icon:'📝',questions:[]};
   renderQuizCategories();
   showToast('🗑 Pytania usunięte');
+}
+
+function openUploadQuiz() {
+  var sel = document.getElementById('quiz-upload-cat');
+  sel.innerHTML = Object.entries(quizData).map(function(e){ return '<option value="'+e[0]+'">'+e[1].name+'</option>'; }).join('');
+  document.getElementById('quiz-upload-file').value = '';
+  document.getElementById('quiz-upload-filename').textContent = '';
+  document.getElementById('quiz-upload-file').onchange = function(){ document.getElementById('quiz-upload-filename').textContent = this.files[0]?this.files[0].name:''; };
+  document.getElementById('quiz-upload-modal').classList.add('open');
+}
+
+async function doUploadQuiz() {
+  var catKey = document.getElementById('quiz-upload-cat').value;
+  var file = document.getElementById('quiz-upload-file').files[0];
+  if (!file) { showToast('⚠️ Wybierz plik TXT'); return; }
+  var text = await file.text();
+  var questions = parseTxtQuestions(text);
+  if (!questions.length) { showToast('⚠️ Nie znaleziono pytań w pliku'); return; }
+  var cat = quizData[catKey] || defaultQuizCategories[catKey] || {name:catKey,icon:'📝'};
+  await db.collection('quizCategories').doc(catKey).set({ name:cat.name, icon:cat.icon, questions:questions });
+  quizData[catKey] = { name:cat.name, icon:cat.icon, questions:questions };
+  document.getElementById('quiz-upload-modal').classList.remove('open');
+  renderQuizCategories();
+  showToast('✅ Załadowano '+questions.length+' pytań do '+cat.name);
 }
 
 async function uploadQuizTxt(event) {

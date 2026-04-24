@@ -273,6 +273,32 @@
   </div>
 </div>
 
+<!-- Upload pytań modal -->
+<div class="modal-overlay" id="quiz-upload-modal" onclick="if(event.target===this)this.classList.remove('open')">
+  <div class="modal">
+    <button class="modal-close" onclick="document.getElementById('quiz-upload-modal').classList.remove('open')">✕</button>
+    <h2 style="margin-bottom:16px;">📂 Załaduj pytania</h2>
+    <div class="form-group" style="margin-bottom:12px;">
+      <label>Wybierz kategorię</label>
+      <select id="quiz-upload-cat" style="margin-top:4px;"></select>
+    </div>
+    <div class="form-group" style="margin-bottom:12px;">
+      <label>Plik TXT z pytaniami</label>
+      <label class="import-label" style="margin-top:4px;">📄 Wybierz plik<input type="file" id="quiz-upload-file" accept=".txt" style="display:none;"></label>
+      <div id="quiz-upload-filename" style="font-size:0.65rem;color:var(--text-dim);margin-top:4px;"></div>
+    </div>
+    <div style="font-size:0.62rem;color:var(--text-muted);margin-bottom:12px;">
+      Format: gwiazdka * przed poprawną odpowiedzią<br>
+      1. Treść pytania?<br>
+      a. Odpowiedź A<br>
+      *b. Odpowiedź B (poprawna)<br>
+      c. Odpowiedź C<br>
+      d. Odpowiedź D
+    </div>
+    <button class="btn-primary" onclick="doUploadQuiz()">📂 ZAŁADUJ PYTANIA</button>
+  </div>
+</div>
+
 <!-- PDF modal -->
 <div class="modal-overlay" id="pdf-modal" onclick="closePdfModal(event)">
   <div class="modal">
