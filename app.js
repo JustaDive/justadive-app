@@ -27,11 +27,46 @@ document.addEventListener('DOMContentLoaded', function() {
 
 // ─── Quiz Data — loaded from Firestore, seeded from JS files ───
 const defaultQuizCategories = {
-  owsd: { name:'Open Water Scuba Diver', icon:'🤿', questions: typeof OWSD_QUESTIONS!=='undefined' ? OWSD_QUESTIONS : [] },
-  aowd: { name:'Advanced OWD', icon:'🌊', questions:[] },
-  rescue: { name:'Rescue Diver', icon:'🆘', questions:[] },
-  equipment: { name:'Sprzęt nurkowy', icon:'⚙️', questions:[] },
-  nitrox: { name:'Nitrox', icon:'🔬', questions:[] }
+  owsd: { name:'Open Water Sport Diver', icon:'🤿', questions: typeof OWSD_QUESTIONS!=='undefined' ? OWSD_QUESTIONS : [] },
+  nav: { name:'Underwater Navigation Diver', icon:'🧭', questions:[] },
+  night: { name:'Night Diving & Limited Visibility Diver', icon:'🌙', questions:[] },
+  narc1: { name:'Narcosis Management Diver Level I', icon:'💨', questions:[] },
+  narc2: { name:'Narcosis Management Diver Level II', icon:'💨', questions:[] },
+  narc3: { name:'Narcosis Management Diver Level III', icon:'💨', questions:[] },
+  drysuit: { name:'Drysuit Diver', icon:'🧥', questions:[] },
+  wreck: { name:'Wreck Diver Cold Water', icon:'🚢', questions:[] },
+  ice: { name:'Ice Diver', icon:'🧊', questions:[] },
+  twinset: { name:'Twinset Diver', icon:'🔧', questions:[] },
+  nitrox: { name:'Nitrox Diver', icon:'🔬', questions:[] },
+  dpv: { name:'DPV Diver', icon:'🚀', questions:[] },
+  ffm: { name:'Full Face Mask Diver', icon:'😷', questions:[] },
+  sm_basic: { name:'Basic OW Sidemount Diver', icon:'🔩', questions:[] },
+  abc_rec: { name:'ABC Rec Diver', icon:'🅰️', questions:[] },
+  aowd: { name:'Advanced OW Diver SILVER', icon:'🥈', questions:[] },
+  firstaid: { name:'First AID', icon:'🩹', questions:[] },
+  rescue: { name:'Rescue Diver RAPID Program', icon:'🆘', questions:[] },
+  master: { name:'Master Diver', icon:'🏆', questions:[] },
+  ai: { name:'Assistant Instructor', icon:'👨‍🏫', questions:[] },
+  abc_tec: { name:'ABC Tec Diver', icon:'🅱️', questions:[] },
+  cave_intro: { name:'Intro To Cave Diver', icon:'🕳️', questions:[] },
+  cave_full: { name:'Full Cave Diver', icon:'🦇', questions:[] },
+  cave_multi: { name:'Multistage Cave Diver', icon:'🗺️', questions:[] },
+  cave_dpv: { name:'DPV Cave Diver', icon:'🚀', questions:[] },
+  adv_nitrox: { name:'Advanced Nitrox Diver', icon:'⚗️', questions:[] },
+  ext_nitrox: { name:'Extended Range Nitrox', icon:'🧪', questions:[] },
+  trimix1: { name:'Trimix Fundamental Diver Level I', icon:'🔷', questions:[] },
+  trimix2: { name:'Trimix Expedition Diver Level II', icon:'🔶', questions:[] },
+  trimix3: { name:'Trimix Explorer Diver Level III', icon:'💎', questions:[] },
+  narc4: { name:'Narcosis Management Diver Level IV', icon:'💨', questions:[] },
+  narc5: { name:'Narcosis Management Diver Level V', icon:'💨', questions:[] },
+  ccr_air: { name:'CCR Air Diluent Diver', icon:'♻️', questions:[] },
+  ccr_tri1: { name:'CCR Trimix Fundamental Level I', icon:'♻️', questions:[] },
+  ccr_tri2: { name:'CCR Trimix Expedition Level II', icon:'♻️', questions:[] },
+  ccr_tri3: { name:'CCR Trimix Explorer Level III', icon:'♻️', questions:[] },
+  sm_adv: { name:'Advanced OW Sidemount Diver', icon:'🔩', questions:[] },
+  sm_oh: { name:'Overhead Sidemount Diver', icon:'🔩', questions:[] },
+  gas_blend: { name:'Advanced Gas Blender', icon:'⛽', questions:[] },
+  o2_tech: { name:'Oxygen Service Technician', icon:'🔧', questions:[] }
 };
 let quizData = {};
 const QUIZ_QUESTIONS_PER_TEST = 20;
@@ -597,81 +632,85 @@ let quizState = null;
 
 async function loadQuizData() {
   quizData = {};
-  const snap = await db.collection('quizCategories').get();
-  // Zawsze aktualizuj OWSD z najnowszymi pytaniami
   if (typeof OWSD_QUESTIONS !== 'undefined' && OWSD_QUESTIONS.length) {
     await db.collection('quizCategories').doc('owsd').set({
-      name:'Open Water Scuba Diver', icon:'🤿', questions: OWSD_QUESTIONS
+      name:'Open Water Sport Diver', icon:'🤿', questions: OWSD_QUESTIONS
     });
   }
-  if (snap.empty) {
-    for (const [key, cat] of Object.entries(defaultQuizCategories)) {
-      if (cat.questions.length) {
-        await db.collection('quizCategories').doc(key).set({ name:cat.name, icon:cat.icon, questions:cat.questions });
-      }
-    }
-  }
-  const snap2 = await db.collection('quizCategories').get();
-  snap2.forEach(doc => { quizData[doc.id] = doc.data(); });
-  for (const [key, cat] of Object.entries(defaultQuizCategories)) {
-    if (!quizData[key]) quizData[key] = { name:cat.name, icon:cat.icon, questions:[] };
+  var snap = await db.collection('quizCategories').get();
+  snap.forEach(function(doc) { quizData[doc.id] = doc.data(); });
+  for (var key in defaultQuizCategories) {
+    if (!quizData[key]) quizData[key] = { name:defaultQuizCategories[key].name, icon:defaultQuizCategories[key].icon, questions:[] };
   }
 }
 
 function renderQuizCategories() {
-  const el = document.getElementById('quiz-categories');
-  let html = Object.entries(quizData).map(([k,cat])=>{
-    const ok = userRole==='instructor'||myEnabledQuizzes.includes(k);
-    const cnt = (cat.questions||[]).length;
-    return '<div class="quiz-cat '+(ok?'':'disabled')+'" '+(ok&&cnt?'onclick="startQuiz(\''+k+'\')"':'')+'><span class="quiz-cat-icon">'+cat.icon+'</span><div class="quiz-cat-name">'+cat.name+'</div><div style="font-size:0.55rem;color:var(--text-muted);margin-top:2px;">'+cnt+' pytań</div>'+(ok?'':'<div class="quiz-locked">🔒 Zablokowany</div>')+'</div>';
+  var el = document.getElementById('quiz-categories');
+  var isPriv = userRole==='admin'||userRole==='instructor';
+  var html = Object.entries(quizData).map(function(entry){
+    var k=entry[0], cat=entry[1];
+    var ok = isPriv || (myEnabledQuizzes||[]).includes(k);
+    var cnt = (cat.questions||[]).length;
+    return '<div class="quiz-cat '+(ok&&cnt?'':'disabled')+'" '+(ok&&cnt?'onclick="startQuiz(\''+k+'\')"':'')+'>'+
+      '<span class="quiz-cat-icon">'+cat.icon+'</span>'+
+      '<div class="quiz-cat-name">'+cat.name+'</div>'+
+      '<div style="font-size:0.55rem;color:var(--text-muted);margin-top:2px;">'+cnt+' pytań</div>'+
+      (ok?'':'<div class="quiz-locked">🔒</div>')+
+      (isPriv&&cnt?'<div style="font-size:0.5rem;color:var(--text-muted);margin-top:2px;cursor:pointer;" onclick="event.stopPropagation();deleteQuizCategory(\''+k+'\')">🗑 usuń pytania</div>':'')+
+      '</div>';
   }).join('');
-  // Instruktor: przycisk upload
-  if (userRole==='instructor') {
+  if (isPriv) {
     html += '<label class="quiz-cat" style="cursor:pointer;"><span class="quiz-cat-icon">📂</span><div class="quiz-cat-name">Załaduj pytania (TXT)</div><input type="file" accept=".txt" onchange="uploadQuizTxt(event)" style="display:none;"></label>';
+    html += '<div class="quiz-cat" onclick="showQuizResults()" style="cursor:pointer;"><span class="quiz-cat-icon">📊</span><div class="quiz-cat-name">Wyniki kursantów</div></div>';
   }
   el.innerHTML = html;
 }
 
-async function uploadQuizTxt(event) {
-  const file = event.target.files[0];
-  if (!file) return;
-  const text = await file.text();
-  const catKey = file.name.replace(/\.txt$/i,'').toLowerCase().replace(/\s+/g,'_');
-  const questions = parseTxtQuestions(text);
-  if (!questions.length) { showToast('⚠️ Nie znaleziono pytań w pliku'); return; }
-  const catName = catKey.toUpperCase().replace(/_/g,' ');
-  await db.collection('quizCategories').doc(catKey).set({
-    name: catName, icon:'📝', questions: questions
-  }, { merge:true });
-  quizData[catKey] = { name:catName, icon:'📝', questions };
+async function deleteQuizCategory(key) {
+  if (!confirm('Usunąć pytania z kategorii '+(quizData[key]||{}).name+'?')) return;
+  await db.collection('quizCategories').doc(key).delete();
+  quizData[key] = defaultQuizCategories[key] || {name:key,icon:'📝',questions:[]};
   renderQuizCategories();
-  showToast('✅ Załadowano '+questions.length+' pytań do kategorii '+catName);
+  showToast('🗑 Pytania usunięte');
+}
+
+async function uploadQuizTxt(event) {
+  var file = event.target.files[0]; if (!file) return;
+  var text = await file.text();
+  var catKey = file.name.replace(/\.txt$/i,'').toLowerCase().replace(/\s+/g,'_');
+  var questions = parseTxtQuestions(text);
+  if (!questions.length) { showToast('⚠️ Nie znaleziono pytań'); return; }
+  var catName = catKey.toUpperCase().replace(/_/g,' ');
+  var icon = '📝';
+  if (defaultQuizCategories[catKey]) { catName = defaultQuizCategories[catKey].name; icon = defaultQuizCategories[catKey].icon; }
+  await db.collection('quizCategories').doc(catKey).set({ name:catName, icon:icon, questions:questions });
+  quizData[catKey] = { name:catName, icon:icon, questions:questions };
+  renderQuizCategories();
+  showToast('✅ Załadowano '+questions.length+' pytań do '+catName);
   event.target.value = '';
 }
 
 function parseTxtQuestions(text) {
-  const questions = [];
-  const lines = text.split('\n').map(l=>l.trim()).filter(l=>l);
-  let i = 0;
+  var questions = [];
+  var lines = text.split('\n').map(function(l){return l.trim();}).filter(function(l){return l;});
+  var i = 0;
   while (i < lines.length) {
-    const qMatch = lines[i].match(/^\d+[\.\)\t]\s*(.+)/);
+    var qMatch = lines[i].match(/^\d+[\.)\t]\s*(.+)/);
     if (!qMatch) { i++; continue; }
-    const qText = qMatch[1];
-    const answers = [];
-    let correct = 0;
+    var qText = qMatch[1];
+    var answers = [];
+    var correct = 0;
     i++;
     while (i < lines.length) {
-      // Odpowiedzi w jednej linii: "a. Prawda    b. Fałsz"
-      const multiMatch = lines[i].match(/^\*?a[\.\)]\s*(.+?)\s+\*?b[\.\)]\s*(.+)$/i);
+      var multiMatch = lines[i].match(/^\*?a[\.)\t]\s*(.+?)\s+\*?b[\.)\t]\s*(.+)$/i);
       if (multiMatch) {
-        const aStarred = lines[i].match(/^\*a[\.\)]/i);
-        const bStarred = lines[i].match(/\s+\*b[\.\)]/i);
+        var bStarred = lines[i].match(/\s+\*b[\.)]/i);
         answers.push(multiMatch[1].trim(), multiMatch[2].trim());
         if (bStarred) correct = 1;
         i++;
         break;
       }
-      const aMatch = lines[i].match(/^(\*?)([a-d])[\.\)\t]\s*(.+)/i);
+      var aMatch = lines[i].match(/^(\*?)([a-d])[\.)\t]\s*(.+)/i);
       if (!aMatch) break;
       if (aMatch[1] === '*') correct = answers.length;
       answers.push(aMatch[3].trim());
@@ -685,41 +724,76 @@ function parseTxtQuestions(text) {
 }
 
 function startQuiz(k) {
-  const cat = quizData[k];
-  if (!cat || !cat.questions || !cat.questions.length) { showToast('⚠️ Brak pytań w tej kategorii'); return; }
-  // Losuj pytania z puli
-  const pool = [...cat.questions].sort(()=>Math.random()-0.5);
-  const qs = pool.slice(0, Math.min(QUIZ_QUESTIONS_PER_TEST, pool.length));
-  quizState = { catKey:k, catName:cat.name, questions:qs, current:0, score:0, total:qs.length };
+  var cat = quizData[k];
+  if (!cat||!cat.questions||!cat.questions.length) { showToast('⚠️ Brak pytań'); return; }
+  var pool = cat.questions.slice().sort(function(){return Math.random()-0.5;});
+  var qs = pool.slice(0, Math.min(QUIZ_QUESTIONS_PER_TEST, pool.length));
+  quizState = { catKey:k, catName:cat.name, questions:qs, current:0, score:0, total:qs.length, errors:[] };
   renderQuizQuestion();
 }
+
 function renderQuizQuestion() {
-  const s=quizState, c=document.getElementById('quiz-container');
-  if (s.current>=s.total) {
-    const pct=Math.round((s.score/s.total)*100);
-    const msg=pct>=80?'🎉 Świetny wynik!':pct>=50?'👍 Nieźle, ale powtórz materiał!':'📚 Musisz jeszcze poćwiczyć!';
-    c.innerHTML='<div class="quiz-result"><div class="quiz-result-title">'+s.catName+'</div><div class="quiz-result-score">'+pct+'%</div><div class="quiz-result-text">'+s.score+'/'+s.total+' poprawnych — '+msg+'</div><button class="btn-primary" onclick="resetQuiz()">🔄 Wróć do kategorii</button></div>';
-    return;
-  }
-  const q=s.questions[s.current];
-  c.innerHTML='<div class="quiz-progress"><div class="quiz-progress-bar"><div class="quiz-progress-fill" style="width:'+(s.current/s.total*100)+'%"></div></div><div class="quiz-progress-text">'+(s.current+1)+'/'+s.total+'</div></div><div class="quiz-question">'+q.q+'</div><div class="quiz-answers" id="quiz-answers">'+q.a.map((a,i)=>'<button class="quiz-answer" onclick="answerQuiz('+i+')">'+a+'</button>').join('')+'</div>';
+  var s = quizState, c = document.getElementById('quiz-container');
+  if (s.current >= s.total) { finishQuiz(); return; }
+  var q = s.questions[s.current];
+  c.innerHTML = '<div class="quiz-progress"><div class="quiz-progress-bar"><div class="quiz-progress-fill" style="width:'+(s.current/s.total*100)+'%"></div></div><div class="quiz-progress-text">'+(s.current+1)+'/'+s.total+'</div></div>'+
+    '<div class="quiz-question">'+q.q+'</div>'+
+    '<div class="quiz-answers" id="quiz-answers">'+q.a.map(function(a,i){return '<button class="quiz-answer" onclick="answerQuiz('+i+')">'+a+'</button>';}).join('')+'</div>'+
+    '<button class="btn-quit" onclick="quitQuiz()">✕ Przerwij egzamin</button>';
 }
+
 function answerQuiz(idx) {
-  const s=quizState, q=s.questions[s.current];
-  document.querySelectorAll('#quiz-answers .quiz-answer').forEach((btn,i)=>{
+  var s = quizState, q = s.questions[s.current];
+  document.querySelectorAll('#quiz-answers .quiz-answer').forEach(function(btn,i){
     btn.classList.add('disabled');
-    if(i===q.c)btn.classList.add('correct');
-    if(i===idx&&idx!==q.c)btn.classList.add('wrong');
+    if(i===q.c) btn.classList.add('correct');
+    if(i===idx&&idx!==q.c) btn.classList.add('wrong');
   });
-  if(idx===q.c)s.score++;
+  if(idx===q.c) s.score++;
+  else s.errors.push({ q:q.q, given:q.a[idx]||'', correct:q.a[q.c]||'' });
   s.current++;
-  setTimeout(renderQuizQuestion,1200);
+  setTimeout(renderQuizQuestion, 1200);
 }
+
+async function finishQuiz() {
+  var s = quizState;
+  var pct = Math.round((s.score/s.total)*100);
+  var msg = pct>=80?'🎉 Świetny wynik!':pct>=50?'👍 Nieźle, powtórz materiał!':'📚 Musisz poćwiczyć!';
+  await db.collection('quizResults').add({
+    userId:currentUser.uid, userName:currentUser.displayName||currentUser.email,
+    userEmail:currentUser.email, category:s.catKey, categoryName:s.catName,
+    score:s.score, total:s.total, percent:pct, errors:s.errors, date:new Date().toISOString()
+  });
+  var errHtml = s.errors.length ? '<div style="margin-top:16px;text-align:left;"><div style="font-size:0.68rem;font-weight:700;color:var(--text-dim);margin-bottom:8px;">Błędy:</div>'+
+    s.errors.map(function(e){return '<div style="background:var(--bg-input);border:1px solid var(--border);border-radius:8px;padding:8px 10px;margin-bottom:4px;font-size:0.72rem;"><div style="color:var(--white);font-weight:700;">'+e.q+'</div><div style="color:var(--danger);">Twoja: '+e.given+'</div><div style="color:#22c55e;">Poprawna: '+e.correct+'</div></div>';}).join('')+'</div>' : '';
+  document.getElementById('quiz-container').innerHTML = '<div class="quiz-result"><div class="quiz-result-title">'+s.catName+'</div><div class="quiz-result-score">'+pct+'%</div><div class="quiz-result-text">'+s.score+'/'+s.total+' — '+msg+'</div>'+errHtml+'<button class="btn-primary" onclick="resetQuiz()" style="margin-top:16px;">🔄 Wróć</button></div>';
+}
+
+function quitQuiz() { if(confirm('Przerwać egzamin?')) resetQuiz(); }
+
 function resetQuiz() {
-  quizState=null;
-  document.getElementById('quiz-container').innerHTML='<div class="card-title">🧠 Test <span class="accent">wiedzy nurkowej</span></div><p style="font-size:0.76rem;color:var(--text-dim);margin-bottom:16px;">Wybierz kurs i sprawdź swoją wiedzę!</p><div id="quiz-categories"></div>';
+  quizState = null;
+  document.getElementById('quiz-container').innerHTML = '<div class="card-title">🧠 <span class="accent">Egzaminy</span></div><p style="font-size:0.76rem;color:var(--text-dim);margin-bottom:16px;">Wybierz kurs i sprawdź swoją wiedzę!</p><div id="quiz-categories"></div>';
   renderQuizCategories();
 }
+
+async function showQuizResults() {
+  var c = document.getElementById('quiz-container');
+  var snap = await db.collection('quizResults').orderBy('date','desc').limit(50).get();
+  if (snap.empty) { c.innerHTML = '<div class="card-title">📊 <span class="accent">Wyniki</span></div><div class="empty-state"><h3>Brak wyników</h3></div><button class="btn-primary" onclick="resetQuiz()">🔄 Wróć</button>'; return; }
+  var html = '<div class="card-title">📊 <span class="accent">Wyniki kursantów</span></div><div style="max-height:60vh;overflow-y:auto;">';
+  snap.forEach(function(doc){
+    var r = doc.data();
+    var color = r.percent>=80?'#22c55e':r.percent>=50?'#f59e0b':'var(--danger)';
+    html += '<div class="student-card" style="cursor:default;margin-bottom:6px;"><div class="student-info"><div class="student-name">'+r.userName+'</div><div class="student-email">'+r.categoryName+' · '+(r.date||'').substring(0,10)+'</div>';
+    if (r.errors&&r.errors.length) html += '<div style="font-size:0.6rem;color:var(--danger);margin-top:2px;">Błędy: '+r.errors.map(function(e){return e.q.substring(0,40)+'...';}).join(', ')+'</div>';
+    html += '</div><div style="font-size:1.1rem;font-weight:800;color:'+color+';">'+r.percent+'%</div></div>';
+  });
+  html += '</div><button class="btn-primary" onclick="resetQuiz()" style="margin-top:12px;">🔄 Wróć</button>';
+  c.innerHTML = html;
+}
+
+
 
 // ─── Admin: load all users & change roles ───
 async function loadAllUsers() {
