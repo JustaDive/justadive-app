@@ -513,7 +513,7 @@ function renderCerts() {
           <div class="cert-back-iso">ISO 49001 Certified / www.psai.pl</div>
         </div>
       </div>
-      ${userRole==='instructor'?'<div class="cert-actions"><button class="btn-delete" onclick="deleteCert(\''+c.id+'\')">🗑 Usuń</button></div>':''}
+      ${userRole==='admin'?'<div class="cert-actions"><button class="btn-delete" onclick="deleteCert(\''+c.id+'\')">🗑 Usuń</button></div>':''}
     </div>`;
   }).join('');
 }
@@ -657,7 +657,7 @@ function renderQuizCategories() {
       '<div class="quiz-cat-name">'+cat.name+'</div>'+
       '<div style="font-size:0.55rem;color:var(--text-muted);margin-top:2px;">'+cnt+' pytań</div>'+
       (ok?'':'<div class="quiz-locked">🔒</div>')+
-      (isAdmin&&cnt?'<div style="font-size:0.5rem;color:var(--text-muted);margin-top:2px;cursor:pointer;" onclick="event.stopPropagation();deleteQuizCategory(\'"''+k+'\'"'')">🗑 usuń pytania</div>':'')+
+      (isAdmin&&cnt?'<div style="font-size:0.5rem;color:var(--text-muted);margin-top:2px;cursor:pointer;" onclick="event.stopPropagation();deleteQuizCategory(\''+k+'\')">🗑 usuń pytania</div>':'')+
       '</div>';
   }).join('');
   if (isAdmin) {
