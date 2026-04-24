@@ -102,16 +102,17 @@ body {
 .brand-logo { height:42px; }
 .brand-text { display: flex; flex-direction: column; }
 .brand-name {
-  font-family: 'Alkatra', cursive;
+  font-family: 'TwCenMT', 'Inter', sans-serif;
   font-size: 1.3rem; font-weight: 700; color: var(--white); letter-spacing: 0.3px;
+  font-style: italic;
 }
 .brand-name .just { color: var(--white); }
 .brand-name .a { color: var(--red); }
 .brand-name .dive { color: var(--white); }
 .brand-sub {
-  font-family: 'TwCenMT', 'Inter', sans-serif;
+  font-family: 'Alkatra', cursive;
   font-size: 0.52rem; letter-spacing: 3px; text-transform: uppercase;
-  color: var(--blue); margin-top: 1px; font-style: italic;
+  color: var(--blue); margin-top: 1px;
 }
 .header-right { display:flex; align-items:center; gap:12px; flex-wrap:wrap; }
 .role-badge {
