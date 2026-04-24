@@ -236,6 +236,26 @@
   </div>
 </div>
 
+<!-- Wybór roli przy rejestracji -->
+<div class="modal-overlay" id="role-modal">
+  <div class="modal" style="text-align:center;">
+    <h2 style="margin-bottom:8px;">👋 Witaj!</h2>
+    <p style="font-size:0.78rem;color:var(--text-dim);margin-bottom:20px;">Kim jesteś?</p>
+    <div style="display:flex;gap:12px;justify-content:center;">
+      <button class="role-choice" onclick="chooseRole('student')">
+        <div style="font-size:2rem;">🎓</div>
+        <div style="font-weight:800;margin-top:6px;">Kursant</div>
+        <div style="font-size:0.65rem;color:var(--text-dim);margin-top:4px;">Uczę się nurkować</div>
+      </button>
+      <button class="role-choice" onclick="chooseRole('instructor')">
+        <div style="font-size:2rem;">🏅</div>
+        <div style="font-weight:800;margin-top:6px;">Instruktor</div>
+        <div style="font-size:0.65rem;color:var(--text-dim);margin-top:4px;">Uczę innych nurkować</div>
+      </button>
+    </div>
+  </div>
+</div>
+
 <!-- Profil -->
 <div class="modal-overlay" id="profile-modal" onclick="closeProfileModal(event)">
   <div class="modal">
@@ -253,14 +273,10 @@
       <div class="form-group full"><label id="lbl-pf-name">Imię i nazwisko</label><input type="text" id="pf-name" placeholder="Jan Kowalski"></div>
       <div class="form-group full"><label>Email</label><input type="email" id="pf-email" disabled style="opacity:0.6;"></div>
       <div class="form-group"><label id="lbl-pf-phone">Telefon</label><input type="tel" id="pf-phone" placeholder="+48 600 000 000"></div>
-      <div class="form-group"><label>Instagram</label><input type="text" id="pf-instagram" placeholder="@username"></div>
+      <div class="form-group"><label id="lbl-pf-certlevel">Poziom certyfikatu</label><input type="text" id="pf-certlevel" placeholder="np. Open Water Diver"></div>
       <div class="form-group"><label id="lbl-pf-street">Ulica</label><input type="text" id="pf-street" placeholder="ul. Nurkowa 1"></div>
       <div class="form-group"><label id="lbl-pf-city">Miasto</label><input type="text" id="pf-city" placeholder="Warszawa"></div>
       <div class="form-group"><label id="lbl-pf-country">Kraj</label><input type="text" id="pf-country" placeholder="Polska"></div>
-      <div class="form-group"><label id="lbl-pf-agency">Agencja</label>
-        <select id="pf-agency"><option value="">— Wybierz —</option><option value="PSAI">PSAI</option><option value="PADI">PADI</option><option value="SSI">SSI</option><option value="CMAS">CMAS</option><option value="NAUI">NAUI</option><option value="SDI/TDI">SDI/TDI</option><option value="BSAC">BSAC</option><option value="Inna">Inna</option></select>
-      </div>
-      <div class="form-group"><label id="lbl-pf-certlevel">Poziom certyfikatu</label><input type="text" id="pf-certlevel" placeholder="np. Open Water Diver"></div>
       <div class="form-group full"><label id="lbl-pf-lang">Język / Language</label>
         <select id="pf-lang" onchange="switchLang(this.value)"><option value="pl">🇵🇱 Polski</option><option value="en">🇬🇧 English</option></select>
       </div>

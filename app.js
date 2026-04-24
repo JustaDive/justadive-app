@@ -79,47 +79,32 @@ function handleEmailAuth(e) {
 }
 function logOut() { auth.signOut(); }
 
+let pendingNewUser = null;
+
 auth.onAuthStateChanged(async user => {
-  if (user) { currentUser = user; await loadUserProfile(user); showApp(user); }
-  else hideApp();
+  if (user) {
+    currentUser = user;
+    var ready = await loadUserProfile(user);
+    if (ready) showApp(user);
+  } else hideApp();
 });
 
 async function loadUserProfile(user) {
   userDocRef = db.collection('users').doc(user.uid);
   const snap = await userDocRef.get();
-  const email = (user.email||'').toLowerCase();
-  const instructorEmails = ['szkuni@gmail.com','biuro@justadive.pl','damianbiniarz@gmail.com'];
-  const isInstructor = instructorEmails.includes(email);
 
   if (!snap.exists) {
-    const schoolData = getSchoolForEmail(email);
-    await userDocRef.set({
-      email: user.email,
-      name: user.displayName || user.email,
-      role: isInstructor ? 'instructor' : 'student',
-      enabledQuizzes: [],
-      schoolName: isInstructor ? schoolData.name : '',
-      schoolLogo: isInstructor ? schoolData.logo : '',
-      instructorUid: '',
-      createdAt: firebase.firestore.FieldValue.serverTimestamp()
-    });
-    userRole = isInstructor ? 'instructor' : 'student';
-    myEnabledQuizzes = [];
-    currentSchoolName = isInstructor ? schoolData.name : '';
-    currentSchoolLogo = isInstructor ? schoolData.logo : '';
+    pendingNewUser = user;
+    document.getElementById('login-screen').style.display = 'none';
+    document.getElementById('role-modal').classList.add('open');
+    return false;
   } else {
     const d = snap.data();
-    if (isInstructor && d.role !== 'instructor') {
-      const schoolData = getSchoolForEmail(email);
-      await userDocRef.update({ role:'instructor', schoolName:schoolData.name, schoolLogo:schoolData.logo });
-      d.role = 'instructor'; d.schoolName = schoolData.name; d.schoolLogo = schoolData.logo;
-    }
     userRole = d.role || 'student';
     myEnabledQuizzes = d.enabledQuizzes || [];
     currentSchoolName = d.schoolName || '';
     currentSchoolLogo = d.schoolLogo || '';
     currentLang = d.lang || 'pl';
-    // Kursant: pobierz logo szkoły instruktora
     if (userRole === 'student' && d.instructorUid) {
       const instrSnap = await db.collection('users').doc(d.instructorUid).get();
       if (instrSnap.exists) {
@@ -127,12 +112,30 @@ async function loadUserProfile(user) {
         currentSchoolLogo = instrSnap.data().schoolLogo || '';
       }
     }
+    return true;
   }
 }
 
-function getSchoolForEmail(email) {
-  if (email === 'damianbiniarz@gmail.com') return { name:'Dive App', logo:'dive-app' };
-  return { name:'Just a Dive', logo:'justadive' };
+async function chooseRole(role) {
+  document.getElementById('role-modal').classList.remove('open');
+  var user = pendingNewUser;
+  pendingNewUser = null;
+  userRole = role;
+  myEnabledQuizzes = [];
+  currentSchoolName = '';
+  currentSchoolLogo = '';
+  currentLang = 'pl';
+  await userDocRef.set({
+    email: user.email,
+    name: user.displayName || user.email,
+    role: role,
+    enabledQuizzes: [],
+    schoolName: '',
+    schoolLogo: '',
+    instructorUid: '',
+    createdAt: firebase.firestore.FieldValue.serverTimestamp()
+  });
+  showApp(user);
 }
 
 async function showApp(user) {
@@ -703,12 +706,10 @@ async function openProfile() {
   document.getElementById('pf-name').value = d.name || '';
   document.getElementById('pf-email').value = d.email || '';
   document.getElementById('pf-phone').value = d.phone || '';
-  document.getElementById('pf-instagram').value = d.instagram || '';
+  document.getElementById('pf-certlevel').value = d.certLevel || '';
   document.getElementById('pf-street').value = d.street || '';
   document.getElementById('pf-city').value = d.city || '';
   document.getElementById('pf-country').value = d.country || '';
-  document.getElementById('pf-agency').value = d.agency || '';
-  document.getElementById('pf-certlevel').value = d.certLevel || '';
   document.getElementById('pf-lang').value = d.lang || currentLang;
   document.getElementById('pf-avatar').src = d.avatar || document.getElementById('user-avatar').src;
   document.getElementById('profile-modal').classList.add('open');
@@ -720,12 +721,10 @@ async function saveProfile() {
   await userDocRef.update({
     name: document.getElementById('pf-name').value.trim(),
     phone: document.getElementById('pf-phone').value.trim(),
-    instagram: document.getElementById('pf-instagram').value.trim(),
+    certLevel: document.getElementById('pf-certlevel').value.trim(),
     street: document.getElementById('pf-street').value.trim(),
     city: document.getElementById('pf-city').value.trim(),
     country: document.getElementById('pf-country').value.trim(),
-    agency: document.getElementById('pf-agency').value,
-    certLevel: document.getElementById('pf-certlevel').value.trim(),
     lang: document.getElementById('pf-lang').value
   });
   closeProfileModalDirect();
