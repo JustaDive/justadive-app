@@ -722,22 +722,22 @@ function parseTxtQuestions(text) {
   var lines = text.split('\n').map(function(l){return l.trim();}).filter(function(l){return l;});
   var i = 0;
   while (i < lines.length) {
-    var qMatch = lines[i].match(/^\d+[\.)\t]\s*(.+)/);
+    var qMatch = lines[i].match(/^\d+[\.\)\t]\s*(.+)/);
     if (!qMatch) { i++; continue; }
     var qText = qMatch[1];
     var answers = [];
     var correct = 0;
     i++;
     while (i < lines.length) {
-      var multiMatch = lines[i].match(/^\*?a[\.)\t]\s*(.+?)\s+\*?b[\.)\t]\s*(.+)$/i);
+      var multiMatch = lines[i].match(/^\*?a[\.\)\t]\s*(.+?)\s+\*?b[\.\)\t]\s*(.+)$/i);
       if (multiMatch) {
-        var bStarred = lines[i].match(/\s+\*b[\.)]/i);
+        var bStarred = lines[i].match(/\s+\*b[\.\)]/i);
         answers.push(multiMatch[1].trim(), multiMatch[2].trim());
         if (bStarred) correct = 1;
         i++;
         break;
       }
-      var aMatch = lines[i].match(/^(\*?)([a-d])[\.)\t]\s*(.+)/i);
+      var aMatch = lines[i].match(/^(\*?)([a-d])[\.\)\t]\s*(.+)/i);
       if (!aMatch) break;
       if (aMatch[1] === '*') correct = answers.length;
       answers.push(aMatch[3].trim());
