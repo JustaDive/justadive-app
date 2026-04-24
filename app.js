@@ -227,7 +227,7 @@ async function showApp(user) {
     document.getElementById('tabs-instructor').style.display='flex';
     document.getElementById('tabs-admin').style.display='none';
     document.getElementById('btn-add-cert').style.display='';
-    document.getElementById('btn-add-pdf').style.display='';
+    document.getElementById('btn-add-pdf').style.display='none';
     document.getElementById('admin-role-section').style.display='none';
     loadStudents();
   } else {
@@ -647,6 +647,7 @@ async function loadQuizData() {
 function renderQuizCategories() {
   var el = document.getElementById('quiz-categories');
   var isPriv = userRole==='admin'||userRole==='instructor';
+  var isAdmin = userRole==='admin';
   var html = Object.entries(quizData).map(function(entry){
     var k=entry[0], cat=entry[1];
     var ok = isPriv || (myEnabledQuizzes||[]).includes(k);
@@ -656,11 +657,13 @@ function renderQuizCategories() {
       '<div class="quiz-cat-name">'+cat.name+'</div>'+
       '<div style="font-size:0.55rem;color:var(--text-muted);margin-top:2px;">'+cnt+' pytań</div>'+
       (ok?'':'<div class="quiz-locked">🔒</div>')+
-      (isPriv&&cnt?'<div style="font-size:0.5rem;color:var(--text-muted);margin-top:2px;cursor:pointer;" onclick="event.stopPropagation();deleteQuizCategory(\''+k+'\')">🗑 usuń pytania</div>':'')+
+      (isAdmin&&cnt?'<div style="font-size:0.5rem;color:var(--text-muted);margin-top:2px;cursor:pointer;" onclick="event.stopPropagation();deleteQuizCategory(\'"''+k+'\'"'')">🗑 usuń pytania</div>':'')+
       '</div>';
   }).join('');
-  if (isPriv) {
+  if (isAdmin) {
     html += '<div class="quiz-cat" onclick="openUploadQuiz()" style="cursor:pointer;"><span class="quiz-cat-icon">📂</span><div class="quiz-cat-name">Załaduj pytania (TXT)</div></div>';
+  }
+  if (isPriv) {
     html += '<div class="quiz-cat" onclick="showQuizResults()" style="cursor:pointer;"><span class="quiz-cat-icon">📊</span><div class="quiz-cat-name">Wyniki kursantów</div></div>';
   }
   el.innerHTML = html;
