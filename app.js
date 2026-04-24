@@ -691,6 +691,32 @@ function resetQuiz() {
   renderQuizCategories();
 }
 
+// ─── Profil ───
+async function openProfile() {
+  var snap = await userDocRef.get();
+  var d = snap.data() || {};
+  document.getElementById('pf-name').value = d.name || '';
+  document.getElementById('pf-email').value = d.email || '';
+  document.getElementById('pf-phone').value = d.phone || '';
+  document.getElementById('pf-instagram').value = d.instagram || '';
+  document.getElementById('pf-address').value = d.address || '';
+  document.getElementById('pf-avatar').src = d.avatar || document.getElementById('user-avatar').src;
+  document.getElementById('profile-modal').classList.add('open');
+}
+function closeProfileModal(e) { if (e.target === document.getElementById('profile-modal')) closeProfileModalDirect(); }
+function closeProfileModalDirect() { document.getElementById('profile-modal').classList.remove('open'); }
+
+async function saveProfile() {
+  await userDocRef.update({
+    name: document.getElementById('pf-name').value.trim(),
+    phone: document.getElementById('pf-phone').value.trim(),
+    instagram: document.getElementById('pf-instagram').value.trim(),
+    address: document.getElementById('pf-address').value.trim()
+  });
+  closeProfileModalDirect();
+  showToast('✅ Profil zapisany!');
+}
+
 // ─── Avatar ───
 function uploadAvatar(event) {
   var file = event.target.files[0];
@@ -709,6 +735,8 @@ function uploadAvatar(event) {
       var base64 = canvas.toDataURL('image/jpeg', 0.7);
       userDocRef.update({ avatar: base64 }).then(function() {
         document.getElementById('user-avatar').src = base64;
+        var pfAv = document.getElementById('pf-avatar');
+        if (pfAv) pfAv.src = base64;
         showToast('✅ Avatar zaktualizowany!');
       });
     };
