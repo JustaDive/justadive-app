@@ -100,6 +100,12 @@ async function loadUserProfile(user) {
     return false;
   } else {
     const d = snap.data();
+    // biuro@justadive.pl = admin
+    const email = (user.email||'').toLowerCase();
+    if (email === 'biuro@justadive.pl' && d.role !== 'admin') {
+      await userDocRef.update({ role: 'admin' });
+      d.role = 'admin';
+    }
     userRole = d.role || 'student';
     myEnabledQuizzes = d.enabledQuizzes || [];
     currentSchoolName = d.schoolName || '';
@@ -169,18 +175,34 @@ async function showApp(user) {
     brandLogo.src = currentSchoolLogo;
     brandName.textContent = currentSchoolName || 'Szkoła Nurkowa';
     brandSub.textContent = '';
-  }  const badge = document.getElementById('role-badge');
-  if (userRole==='instructor') {
+  }
+  const badge = document.getElementById('role-badge');
+  if (userRole==='admin') {
+    badge.textContent='⚡ Admin'; badge.className='role-badge admin';
+    document.getElementById('tabs-student').style.display='none';
+    document.getElementById('tabs-instructor').style.display='none';
+    document.getElementById('tabs-admin').style.display='flex';
+    document.getElementById('btn-add-cert').style.display='';
+    document.getElementById('btn-add-pdf').style.display='';
+    document.getElementById('admin-role-section').style.display='';
+    loadAllUsers();
+  } else if (userRole==='instructor') {
     badge.textContent='🏅 Instruktor'; badge.className='role-badge instructor';
     document.getElementById('tabs-student').style.display='none';
     document.getElementById('tabs-instructor').style.display='flex';
+    document.getElementById('tabs-admin').style.display='none';
     document.getElementById('btn-add-cert').style.display='';
+    document.getElementById('btn-add-pdf').style.display='';
+    document.getElementById('admin-role-section').style.display='none';
     loadStudents();
   } else {
     badge.textContent='🎓 Kursant'; badge.className='role-badge student';
     document.getElementById('tabs-student').style.display='flex';
     document.getElementById('tabs-instructor').style.display='none';
+    document.getElementById('tabs-admin').style.display='none';
     document.getElementById('btn-add-cert').style.display='none';
+    document.getElementById('btn-add-pdf').style.display='none';
+    document.getElementById('admin-role-section').style.display='none';
   }
   divesCol = userDocRef.collection('dives');
   certsCol = userDocRef.collection('certs');
@@ -189,7 +211,7 @@ async function showApp(user) {
     dives = snap.docs.map(doc=>({id:doc.id,...doc.data()}));
     dives.forEach((d,i)=>d.num=dives.length-i);
     updateStats();
-    if (document.getElementById('panel-history').classList.contains('active')) renderDives();
+    if (document.getElementById('panel-log').classList.contains('active')) renderDives();
   });
   if (unsubCerts) unsubCerts();
   unsubCerts = certsCol.orderBy('date','desc').onSnapshot(snap => {
@@ -198,6 +220,7 @@ async function showApp(user) {
   });
   await loadQuizData();
   renderQuizCategories();
+  listenLibrary();
   switchTab('certs');
   if (currentLang !== 'pl') switchLang(currentLang);
 }
@@ -208,23 +231,25 @@ function hideApp() {
   document.getElementById('app-container').style.display = 'none';
   if (unsubDives){unsubDives();unsubDives=null;}
   if (unsubCerts){unsubCerts();unsubCerts=null;}
+  if (unsubLibrary){unsubLibrary();unsubLibrary=null;}
   currentUser=null; dives=[]; certs=[]; students=[];
 }
 
 // ─── Tabs ───
 function switchTab(tab) {
   const names = {
-    '📋 Loguj':'log','🌊 Nurki':'history','🎓 Certyfikaty':'certs',
-    '🧠 Quiz':'quiz','🛒 Sklep':'shop','👥 Kursanci':'manage'
+    '🎓 Certyfikaty':'certs','🧠 Egzaminy':'quiz','📚 Biblioteka':'library',
+    '📋 Logbook':'log','🛒 Sklep':'shop','👥 Kursanci':'manage','👥 Zarządzanie':'manage'
   };
   document.querySelectorAll('.tab').forEach(t => {
     const n = names[t.textContent.trim()]; t.classList.toggle('active', n===tab);
   });
   document.querySelectorAll('.panel').forEach(p=>p.classList.remove('active'));
   document.getElementById('panel-'+tab).classList.add('active');
-  if (tab==='history') renderDives();
+  if (tab==='log') renderDives();
   if (tab==='certs') renderCerts();
   if (tab==='manage') renderStudents();
+  if (tab==='library') renderLibrary();
 }
 
 // ─── Stats ───
@@ -694,6 +719,84 @@ function resetQuiz() {
   quizState=null;
   document.getElementById('quiz-container').innerHTML='<div class="card-title">🧠 Test <span class="accent">wiedzy nurkowej</span></div><p style="font-size:0.76rem;color:var(--text-dim);margin-bottom:16px;">Wybierz kurs i sprawdź swoją wiedzę!</p><div id="quiz-categories"></div>';
   renderQuizCategories();
+}
+
+// ─── Admin: load all users & change roles ───
+async function loadAllUsers() {
+  const snap = await db.collection('users').get();
+  students = snap.docs.map(doc=>({uid:doc.id,...doc.data()}));
+}
+
+async function changeUserRole() {
+  var email = document.getElementById('change-role-email').value.trim().toLowerCase();
+  var newRole = document.getElementById('change-role-select').value;
+  if (!email) { showToast('⚠️ Podaj email'); return; }
+  var snap = await db.collection('users').where('email','==',email).get();
+  if (snap.empty) { showToast('⚠️ Nie znaleziono użytkownika'); return; }
+  await db.collection('users').doc(snap.docs[0].id).update({ role: newRole });
+  document.getElementById('change-role-email').value = '';
+  await loadAllUsers(); renderStudents();
+  showToast('✅ Rola zmieniona na: ' + newRole);
+}
+
+// ─── Biblioteka ───
+let libraryItems = [];
+let unsubLibrary = null;
+
+function listenLibrary() {
+  if (unsubLibrary) unsubLibrary();
+  unsubLibrary = db.collection('library').orderBy('title').onSnapshot(snap => {
+    libraryItems = snap.docs.map(doc=>({id:doc.id,...doc.data()}));
+    if (document.getElementById('panel-library').classList.contains('active')) renderLibrary();
+  });
+}
+
+function renderLibrary() {
+  var grid = document.getElementById('library-grid');
+  var enabledLib = myEnabledQuizzes; // reuse enabledQuizzes for library access too
+  if (!libraryItems.length) {
+    grid.innerHTML = '<div class="empty-state"><span class="empty-icon">📚</span><h3>Brak materiałów</h3><p>Materiały pojawią się gdy admin je doda.</p></div>';
+    return;
+  }
+  var isPrivileged = userRole==='admin'||userRole==='instructor';
+  grid.innerHTML = libraryItems.map(item => {
+    var unlocked = isPrivileged || (item.unlockedFor||[]).includes(currentUser.uid);
+    return '<div class="library-item">' +
+      '<div class="library-icon">📄</div>' +
+      '<div class="library-info"><div class="library-title">' + item.title + '</div><div class="library-cat">' + (item.category||'') + '</div></div>' +
+      (unlocked
+        ? '<a href="' + item.url + '" target="_blank" class="library-btn">📥 Pobierz</a>'
+        : '<div class="library-locked">🔒 Zablokowany</div>') +
+      (isPrivileged ? ' <button class="btn-delete" onclick="deleteLibItem(\'' + item.id + '\')" style="margin-left:6px;">🗑</button>' : '') +
+      '</div>';
+  }).join('');
+}
+
+function openPdfModal() {
+  ['pdf-title','pdf-category','pdf-url'].forEach(id=>document.getElementById(id).value='');
+  document.getElementById('pdf-modal').classList.add('open');
+}
+function closePdfModal(e) { if(e.target===document.getElementById('pdf-modal')) closePdfModalDirect(); }
+function closePdfModalDirect() { document.getElementById('pdf-modal').classList.remove('open'); }
+
+async function savePdf() {
+  var title = document.getElementById('pdf-title').value.trim();
+  var url = document.getElementById('pdf-url').value.trim();
+  if (!title||!url) { showToast('⚠️ Podaj tytuł i link'); return; }
+  await db.collection('library').add({
+    title: title,
+    category: document.getElementById('pdf-category').value.trim(),
+    url: url,
+    unlockedFor: []
+  });
+  closePdfModalDirect();
+  showToast('✅ Materiał dodany!');
+}
+
+async function deleteLibItem(id) {
+  if (!confirm('Usunąć ten materiał?')) return;
+  await db.collection('library').doc(id).delete();
+  showToast('🗑 Materiał usunięty');
 }
 
 // ─── Profil ───

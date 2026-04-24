@@ -119,6 +119,7 @@ body {
   padding:4px 10px; border-radius:8px; font-size:0.68rem; font-weight:700;
   letter-spacing:0.5px;
 }
+.role-badge.admin { background:rgba(255,180,0,0.15); color:#ffb400; border:1px solid rgba(255,180,0,0.3); }
 .role-badge.instructor { background:rgba(228,57,70,0.15); color:var(--red); border:1px solid rgba(228,57,70,0.3); }
 .role-badge.student { background:var(--blue-dim); color:var(--blue); border:1px solid rgba(41,171,226,0.3); }
 .lang-toggle {
@@ -398,6 +399,25 @@ select option { background: #fff; color: #1a1a1a; }
 /* ── Cert form modal ── */
 .cert-form-grid { display:grid; grid-template-columns:1fr 1fr; gap:10px; }
 .cert-form-grid .full { grid-column:1/-1; }
+
+/* ── Library ── */
+.library-grid { display:flex; flex-direction:column; gap:8px; }
+.library-item {
+  background:var(--bg-card); border:1px solid var(--border); border-radius:12px;
+  padding:14px 16px; display:flex; align-items:center; gap:12px; transition:all 0.2s;
+}
+.library-item:hover { border-color:var(--blue); background:var(--bg-card-hover); }
+.library-icon { font-size:1.4rem; }
+.library-info { flex:1; }
+.library-title { font-size:0.84rem; font-weight:700; color:var(--white); }
+.library-cat { font-size:0.65rem; color:var(--text-dim); }
+.library-locked { font-size:0.65rem; color:var(--text-muted); }
+.library-btn {
+  background:var(--blue-dim); border:1px solid var(--blue); border-radius:8px;
+  padding:6px 12px; color:var(--blue); font-size:0.68rem; font-weight:700;
+  cursor:pointer; transition:all 0.2s; font-family:inherit; text-decoration:none;
+}
+.library-btn:hover { background:var(--blue); color:#fff; }
 
 /* ── Role choice ── */
 .role-choice {

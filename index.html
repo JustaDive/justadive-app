@@ -68,23 +68,44 @@
   <!-- Tabs: kursant -->
   <div class="tabs-bar" id="tabs-student">
     <button class="tab active" onclick="switchTab('certs')">🎓 Certyfikaty</button>
-    <button class="tab" onclick="switchTab('quiz')">🧠 Quiz</button>
-    <button class="tab" onclick="switchTab('log')">📋 Loguj</button>
-    <button class="tab" onclick="switchTab('history')">🌊 Nurki</button>
+    <button class="tab" onclick="switchTab('quiz')">🧠 Egzaminy</button>
+    <button class="tab" onclick="switchTab('library')">📚 Biblioteka</button>
+    <button class="tab" onclick="switchTab('log')">📋 Logbook</button>
     <button class="tab" onclick="switchTab('shop')">🛒 Sklep</button>
   </div>
 
   <!-- Tabs: instruktor -->
   <div class="tabs-bar" id="tabs-instructor" style="display:none;">
     <button class="tab active" onclick="switchTab('certs')">🎓 Certyfikaty</button>
-    <button class="tab" onclick="switchTab('quiz')">🧠 Quiz</button>
-    <button class="tab" onclick="switchTab('log')">📋 Loguj</button>
-    <button class="tab" onclick="switchTab('history')">🌊 Nurki</button>
+    <button class="tab" onclick="switchTab('quiz')">🧠 Egzaminy</button>
+    <button class="tab" onclick="switchTab('library')">📚 Biblioteka</button>
+    <button class="tab" onclick="switchTab('log')">📋 Logbook</button>
     <button class="tab" onclick="switchTab('shop')">🛒 Sklep</button>
     <button class="tab" onclick="switchTab('manage')">👥 Kursanci</button>
   </div>
 
-  <!-- Log Dive -->
+  <!-- Tabs: admin -->
+  <div class="tabs-bar" id="tabs-admin" style="display:none;">
+    <button class="tab active" onclick="switchTab('certs')">🎓 Certyfikaty</button>
+    <button class="tab" onclick="switchTab('quiz')">🧠 Egzaminy</button>
+    <button class="tab" onclick="switchTab('library')">📚 Biblioteka</button>
+    <button class="tab" onclick="switchTab('log')">📋 Logbook</button>
+    <button class="tab" onclick="switchTab('shop')">🛒 Sklep</button>
+    <button class="tab" onclick="switchTab('manage')">👥 Zarządzanie</button>
+  </div>
+
+  <!-- Biblioteka -->
+  <div class="panel" id="panel-library">
+    <div class="card" style="margin-bottom:12px;">
+      <div class="card-title">📚 <span class="accent">Biblioteka</span></div>
+      <p style="font-size:0.76rem;color:var(--text-dim);margin-bottom:0;">Materiały szkoleniowe do pobrania.</p>
+    </div>
+    <div id="library-grid" class="library-grid"></div>
+    <!-- Admin/Instruktor: dodaj PDF -->
+    <button class="btn-add-cert" id="btn-add-pdf" onclick="openPdfModal()" style="margin-top:12px;width:100%;display:none;">+ Dodaj materiał (PDF)</button>
+  </div>
+
+  <!-- Log Dive (Logbook) -->
   <div class="panel" id="panel-log">
     <div class="card">
       <div class="card-title">🧭 Nowy <span class="accent">Wpis nurkowy</span></div>
@@ -120,21 +141,20 @@
         <div style="font-size:0.6rem;color:var(--text-muted);margin-top:4px;">Subsurface XML, UDDF, CSV</div>
       </div>
     </div>
-  </div>
-
-  <!-- My Dives -->
-  <div class="panel" id="panel-history">
-    <div class="filters">
-      <input type="text" class="search-input" id="search-input" placeholder="🔍 Szukaj miejsca, lokalizacji..." oninput="renderDives()">
-      <select class="filter-select" id="filter-type" onchange="renderDives()">
-        <option value="">Wszystkie typy</option>
-        <option value="Recreational">Rekreacyjne</option><option value="Technical">Techniczne</option>
-        <option value="Cave">Jaskiniowe</option><option value="Night">Nocne</option>
-        <option value="Wreck">Wrakowe</option><option value="Drift">Dryfowe</option>
-        <option value="Deep">Głębokie</option><option value="Training">Szkoleniowe</option>
-      </select>
+    <!-- Lista nurkowań -->
+    <div style="margin-top:16px;">
+      <div class="filters">
+        <input type="text" class="search-input" id="search-input" placeholder="🔍 Szukaj miejsca, lokalizacji..." oninput="renderDives()">
+        <select class="filter-select" id="filter-type" onchange="renderDives()">
+          <option value="">Wszystkie typy</option>
+          <option value="Recreational">Rekreacyjne</option><option value="Technical">Techniczne</option>
+          <option value="Cave">Jaskiniowe</option><option value="Night">Nocne</option>
+          <option value="Wreck">Wrakowe</option><option value="Drift">Dryfowe</option>
+          <option value="Deep">Głębokie</option><option value="Training">Szkoleniowe</option>
+        </select>
+      </div>
+      <div class="dives-list" id="dives-grid"></div>
     </div>
-    <div class="dives-list" id="dives-grid"></div>
   </div>
 
   <!-- Certyfikaty -->
@@ -174,10 +194,12 @@
     <div class="shop-contact">📞 +48 666 663 224 · 🌐 www.justadive.pl</div>
   </div>
 
-  <!-- Panel instruktora -->
+  <!-- Panel zarządzania (instruktor: kursanci, admin: wszyscy) -->
   <div class="panel" id="panel-manage">
     <div class="card">
-      <div class="card-title">👥 Zarządzanie <span class="accent">kursantami</span></div>
+      <div class="card-title">👥 <span class="accent" id="manage-title">Zarządzanie</span></div>
+
+      <!-- Dodaj użytkownika -->
       <div style="margin-bottom:18px;">
         <label>Dodaj kursanta (email)</label>
         <div style="display:flex;gap:8px;margin-top:4px;">
@@ -185,6 +207,21 @@
           <button class="btn-primary" onclick="addStudent()" style="width:auto;margin:0;padding:10px 18px;">Dodaj</button>
         </div>
       </div>
+
+      <!-- Admin: zmiana ról -->
+      <div id="admin-role-section" style="display:none;margin-bottom:18px;">
+        <label>Zmień rolę użytkownika</label>
+        <div style="display:flex;gap:8px;margin-top:4px;">
+          <input type="email" id="change-role-email" placeholder="email@użytkownika.pl" style="flex:1;">
+          <select id="change-role-select" style="width:auto;">
+            <option value="student">Kursant</option>
+            <option value="instructor">Instruktor</option>
+            <option value="admin">Admin</option>
+          </select>
+          <button class="btn-primary" onclick="changeUserRole()" style="width:auto;margin:0;padding:10px 18px;">Zmień</button>
+        </div>
+      </div>
+
       <div id="students-list"></div>
     </div>
   </div>
@@ -236,12 +273,26 @@
   </div>
 </div>
 
+<!-- PDF modal -->
+<div class="modal-overlay" id="pdf-modal" onclick="closePdfModal(event)">
+  <div class="modal">
+    <button class="modal-close" onclick="closePdfModalDirect()">✕</button>
+    <h2 style="margin-bottom:16px;">📚 Dodaj materiał</h2>
+    <div class="cert-form-grid">
+      <div class="form-group full"><label>Tytuł</label><input type="text" id="pdf-title" placeholder="np. PSAI Open Water - Podręcznik"></div>
+      <div class="form-group full"><label>Kategoria</label><input type="text" id="pdf-category" placeholder="np. Open Water Diver"></div>
+      <div class="form-group full"><label>Link do PDF</label><input type="url" id="pdf-url" placeholder="https://..."></div>
+    </div>
+    <button class="btn-primary" onclick="savePdf()" style="margin-top:12px;">💾 ZAPISZ</button>
+  </div>
+</div>
+
 <!-- Wybór roli przy rejestracji -->
 <div class="modal-overlay" id="role-modal">
   <div class="modal" style="text-align:center;">
     <h2 style="margin-bottom:8px;">👋 Witaj!</h2>
     <p style="font-size:0.78rem;color:var(--text-dim);margin-bottom:20px;">Kim jesteś?</p>
-    <div style="display:flex;gap:12px;justify-content:center;">
+    <div style="display:flex;gap:12px;justify-content:center;flex-wrap:wrap;">
       <button class="role-choice" onclick="chooseRole('student')">
         <div style="font-size:2rem;">🎓</div>
         <div style="font-weight:800;margin-top:6px;">Kursant</div>
