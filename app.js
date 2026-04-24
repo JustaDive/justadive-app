@@ -140,7 +140,14 @@ async function showApp(user) {
   document.getElementById('app-container').style.display = '';
   document.getElementById('user-menu').style.display = 'flex';
   const av = document.getElementById('user-avatar');
-  av.src = user.photoURL||''; av.title = user.displayName||user.email||'';
+  // Avatar: najpierw z Firestore, potem Google, potem placeholder
+  const userData = (await userDocRef.get()).data();
+  if (userData && userData.avatar) {
+    av.src = userData.avatar;
+  } else {
+    av.src = user.photoURL || 'data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 40 40"><circle cx="20" cy="20" r="20" fill="%23264060"/><text x="20" y="26" text-anchor="middle" fill="%2329abe2" font-size="18" font-weight="bold">' + (user.displayName||user.email||'?')[0].toUpperCase() + '</text></svg>';
+  }
+  av.title = 'Kliknij aby zmienić zdjęcie';
 
   // Logo szkoły w headerze
   const brandLogo = document.getElementById('brand-logo');
@@ -682,6 +689,32 @@ function resetQuiz() {
   quizState=null;
   document.getElementById('quiz-container').innerHTML='<div class="card-title">🧠 Test <span class="accent">wiedzy nurkowej</span></div><p style="font-size:0.76rem;color:var(--text-dim);margin-bottom:16px;">Wybierz kurs i sprawdź swoją wiedzę!</p><div id="quiz-categories"></div>';
   renderQuizCategories();
+}
+
+// ─── Avatar ───
+function uploadAvatar(event) {
+  var file = event.target.files[0];
+  if (!file) return;
+  var reader = new FileReader();
+  reader.onload = function(e) {
+    var img = new Image();
+    img.onload = function() {
+      var canvas = document.createElement('canvas');
+      var size = 120;
+      canvas.width = size; canvas.height = size;
+      var ctx = canvas.getContext('2d');
+      var min = Math.min(img.width, img.height);
+      var sx = (img.width - min) / 2, sy = (img.height - min) / 2;
+      ctx.drawImage(img, sx, sy, min, min, 0, 0, size, size);
+      var base64 = canvas.toDataURL('image/jpeg', 0.7);
+      userDocRef.update({ avatar: base64 }).then(function() {
+        document.getElementById('user-avatar').src = base64;
+        showToast('✅ Avatar zaktualizowany!');
+      });
+    };
+    img.src = e.target.result;
+  };
+  reader.readAsDataURL(file);
 }
 
 // ─── Toast ───

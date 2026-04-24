@@ -55,7 +55,10 @@
       </div>
       <div class="role-badge" id="role-badge"></div>
       <div class="user-menu" id="user-menu" style="display:none;">
-        <img id="user-avatar" class="user-avatar" alt="">
+        <label style="cursor:pointer;margin:0;padding:0;">
+          <img id="user-avatar" class="user-avatar" alt="" title="Kliknij aby zmienić zdjęcie">
+          <input type="file" id="avatar-upload" accept="image/*" onchange="uploadAvatar(event)" style="display:none;">
+        </label>
         <button class="lang-toggle" onclick="logOut()">↩</button>
       </div>
     </div>
