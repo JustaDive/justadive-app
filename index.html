@@ -249,13 +249,23 @@
       </label>
     </div>
     <div class="cert-form-grid">
-      <div class="form-group full"><label>Imię i nazwisko</label><input type="text" id="pf-name" placeholder="Jan Kowalski"></div>
+      <div class="form-group full"><label id="lbl-pf-role">Rola</label><input type="text" id="pf-role" disabled style="opacity:0.6;"></div>
+      <div class="form-group full"><label id="lbl-pf-name">Imię i nazwisko</label><input type="text" id="pf-name" placeholder="Jan Kowalski"></div>
       <div class="form-group full"><label>Email</label><input type="email" id="pf-email" disabled style="opacity:0.6;"></div>
-      <div class="form-group"><label>Telefon</label><input type="tel" id="pf-phone" placeholder="+48 600 000 000"></div>
+      <div class="form-group"><label id="lbl-pf-phone">Telefon</label><input type="tel" id="pf-phone" placeholder="+48 600 000 000"></div>
       <div class="form-group"><label>Instagram</label><input type="text" id="pf-instagram" placeholder="@username"></div>
-      <div class="form-group full"><label>Adres</label><input type="text" id="pf-address" placeholder="Miasto, kraj"></div>
+      <div class="form-group"><label id="lbl-pf-street">Ulica</label><input type="text" id="pf-street" placeholder="ul. Nurkowa 1"></div>
+      <div class="form-group"><label id="lbl-pf-city">Miasto</label><input type="text" id="pf-city" placeholder="Warszawa"></div>
+      <div class="form-group"><label id="lbl-pf-country">Kraj</label><input type="text" id="pf-country" placeholder="Polska"></div>
+      <div class="form-group"><label id="lbl-pf-agency">Agencja</label>
+        <select id="pf-agency"><option value="">— Wybierz —</option><option value="PSAI">PSAI</option><option value="PADI">PADI</option><option value="SSI">SSI</option><option value="CMAS">CMAS</option><option value="NAUI">NAUI</option><option value="SDI/TDI">SDI/TDI</option><option value="BSAC">BSAC</option><option value="Inna">Inna</option></select>
+      </div>
+      <div class="form-group"><label id="lbl-pf-certlevel">Poziom certyfikatu</label><input type="text" id="pf-certlevel" placeholder="np. Open Water Diver"></div>
+      <div class="form-group full"><label id="lbl-pf-lang">Język / Language</label>
+        <select id="pf-lang" onchange="switchLang(this.value)"><option value="pl">🇵🇱 Polski</option><option value="en">🇬🇧 English</option></select>
+      </div>
     </div>
-    <button class="btn-primary" onclick="saveProfile()" style="margin-top:12px;">💾 ZAPISZ PROFIL</button>
+    <button class="btn-primary" onclick="saveProfile()" style="margin-top:12px;">💾 <span class="t" data-pl="ZAPISZ PROFIL" data-en="SAVE PROFILE">ZAPISZ PROFIL</span></button>
   </div>
 </div>
 

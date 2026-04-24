@@ -118,6 +118,7 @@ async function loadUserProfile(user) {
     myEnabledQuizzes = d.enabledQuizzes || [];
     currentSchoolName = d.schoolName || '';
     currentSchoolLogo = d.schoolLogo || '';
+    currentLang = d.lang || 'pl';
     // Kursant: pobierz logo szkoły instruktora
     if (userRole === 'student' && d.instructorUid) {
       const instrSnap = await db.collection('users').doc(d.instructorUid).get();
@@ -195,6 +196,7 @@ async function showApp(user) {
   await loadQuizData();
   renderQuizCategories();
   switchTab('certs');
+  if (currentLang !== 'pl') switchLang(currentLang);
 }
 
 function hideApp() {
@@ -692,14 +694,22 @@ function resetQuiz() {
 }
 
 // ─── Profil ───
+let currentLang = 'pl';
+
 async function openProfile() {
   var snap = await userDocRef.get();
   var d = snap.data() || {};
+  document.getElementById('pf-role').value = userRole === 'instructor' ? (currentLang==='pl'?'Instruktor':'Instructor') : (currentLang==='pl'?'Kursant':'Student');
   document.getElementById('pf-name').value = d.name || '';
   document.getElementById('pf-email').value = d.email || '';
   document.getElementById('pf-phone').value = d.phone || '';
   document.getElementById('pf-instagram').value = d.instagram || '';
-  document.getElementById('pf-address').value = d.address || '';
+  document.getElementById('pf-street').value = d.street || '';
+  document.getElementById('pf-city').value = d.city || '';
+  document.getElementById('pf-country').value = d.country || '';
+  document.getElementById('pf-agency').value = d.agency || '';
+  document.getElementById('pf-certlevel').value = d.certLevel || '';
+  document.getElementById('pf-lang').value = d.lang || currentLang;
   document.getElementById('pf-avatar').src = d.avatar || document.getElementById('user-avatar').src;
   document.getElementById('profile-modal').classList.add('open');
 }
@@ -711,10 +721,60 @@ async function saveProfile() {
     name: document.getElementById('pf-name').value.trim(),
     phone: document.getElementById('pf-phone').value.trim(),
     instagram: document.getElementById('pf-instagram').value.trim(),
-    address: document.getElementById('pf-address').value.trim()
+    street: document.getElementById('pf-street').value.trim(),
+    city: document.getElementById('pf-city').value.trim(),
+    country: document.getElementById('pf-country').value.trim(),
+    agency: document.getElementById('pf-agency').value,
+    certLevel: document.getElementById('pf-certlevel').value.trim(),
+    lang: document.getElementById('pf-lang').value
   });
   closeProfileModalDirect();
-  showToast('✅ Profil zapisany!');
+  showToast(currentLang==='pl'?'✅ Profil zapisany!':'✅ Profile saved!');
+}
+
+// ─── Język / Language ───
+const translations = {
+  // Tabs
+  '🎓 Certyfikaty':{ en:'🎓 Certificates' },
+  '🧠 Quiz':{ en:'🧠 Quiz' },
+  '📋 Loguj':{ en:'📋 Log Dive' },
+  '🌊 Nurki':{ en:'🌊 My Dives' },
+  '🛒 Sklep':{ en:'🛒 Shop' },
+  '👥 Kursanci':{ en:'👥 Students' },
+};
+
+function switchLang(lang) {
+  currentLang = lang;
+  // Tabs
+  document.querySelectorAll('.tab').forEach(t => {
+    var pl = t.textContent.trim();
+    if (lang === 'en' && translations[pl]) t.textContent = translations[pl].en;
+    // Restore PL from data attribute
+    if (!t.dataset.pl) t.dataset.pl = pl;
+    if (lang === 'pl' && t.dataset.pl) t.textContent = t.dataset.pl;
+  });
+  // Profile labels
+  var labels = {
+    'lbl-pf-role':{pl:'Rola',en:'Role'},
+    'lbl-pf-name':{pl:'Imię i nazwisko',en:'Full name'},
+    'lbl-pf-phone':{pl:'Telefon',en:'Phone'},
+    'lbl-pf-street':{pl:'Ulica',en:'Street'},
+    'lbl-pf-city':{pl:'Miasto',en:'City'},
+    'lbl-pf-country':{pl:'Kraj',en:'Country'},
+    'lbl-pf-agency':{pl:'Agencja',en:'Agency'},
+    'lbl-pf-certlevel':{pl:'Poziom certyfikatu',en:'Certification level'},
+    'lbl-pf-lang':{pl:'Język / Language',en:'Language / Język'}
+  };
+  for (var id in labels) {
+    var el = document.getElementById(id);
+    if (el) el.textContent = labels[id][lang] || labels[id].pl;
+  }
+  // Role badge
+  var badge = document.getElementById('role-badge');
+  if (badge) {
+    if (userRole==='instructor') badge.textContent = lang==='pl'?'🏅 Instruktor':'🏅 Instructor';
+    else badge.textContent = lang==='pl'?'🎓 Kursant':'🎓 Student';
+  }
 }
 
 // ─── Avatar ───
