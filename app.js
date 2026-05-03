@@ -610,10 +610,11 @@ async function addStudent() {
 }
 function renderStudents() {
   const el = document.getElementById('students-list');
-  if (!students.length){el.innerHTML='<div class="empty-state"><span class="empty-icon">👥</span><h3>Brak kursantów</h3><p>Kursanci pojawią się po rejestracji.</p></div>';return;}
+  if (!students.length){el.innerHTML='<div class="empty-state"><span class="empty-icon">👥</span><h3>Brak kursantów</h3><p>Dodaj kursanta po emailu.</p></div>';return;}
   el.innerHTML = students.map(s=>{
     const en=(s.enabledQuizzes||[]).length, tot=Object.keys(quizData).length;
-    return '<div class="student-card" onclick="openStudentModal(\''+s.uid+'\')"><div class="student-info"><div class="student-name">'+(s.name||s.email)+'</div><div class="student-email">'+s.email+'</div></div><div class="student-quizzes">'+en+'/'+tot+' quizów</div></div>';
+    const fullName = ((s.firstName||'') + ' ' + (s.lastName||'')).trim() || s.name || '';
+    return '<div class="student-card" onclick="openStudentModal(\''+s.uid+'\')"><div class="student-info"><div class="student-name">'+fullName+'</div><div class="student-email">'+s.email+'</div></div><div class="student-quizzes">'+en+'/'+tot+' egz.</div></div>';
   }).join('');
 }
 function openStudentModal(uid) {
@@ -676,6 +677,9 @@ function renderQuizCategories() {
   }
   if (isPriv) {
     html += '<div class="quiz-cat" onclick="showQuizResults()" style="cursor:pointer;"><span class="quiz-cat-icon">📊</span><div class="quiz-cat-name">Wyniki kursantów</div></div>';
+  }
+  if (userRole === 'student') {
+    html += '<div class="quiz-cat" onclick="showMyResults()" style="cursor:pointer;"><span class="quiz-cat-icon">📊</span><div class="quiz-cat-name">Moje wyniki</div></div>';
   }
   el.innerHTML = html;
 }
@@ -815,6 +819,22 @@ function resetQuiz() {
   renderQuizCategories();
 }
 
+async function showMyResults() {
+  var c = document.getElementById('quiz-container');
+  var snap = await db.collection('quizResults').where('userId','==',currentUser.uid).orderBy('date','desc').limit(20).get();
+  if (snap.empty) { c.innerHTML = '<div class="card-title">📊 <span class="accent">Moje wyniki</span></div><div class="empty-state"><h3>Brak wyników</h3><p>Rozwiąż egzamin żeby zobaczyć wyniki.</p></div><button class="btn-primary" onclick="resetQuiz()">🔄 Wróć</button>'; return; }
+  var html = '<div class="card-title">📊 <span class="accent">Moje wyniki</span></div><div style="max-height:60vh;overflow-y:auto;">';
+  snap.forEach(function(doc){
+    var r = doc.data();
+    var color = r.percent>=80?'#22c55e':r.percent>=50?'#f59e0b':'var(--danger)';
+    html += '<div class="student-card" style="cursor:default;margin-bottom:6px;"><div class="student-info"><div class="student-name">'+r.categoryName+'</div><div class="student-email">'+(r.date||'').substring(0,10)+' · '+r.score+'/'+r.total+'</div>';
+    if (r.errors&&r.errors.length) html += '<div style="font-size:0.6rem;color:var(--danger);margin-top:2px;">'+r.errors.length+' błędów</div>';
+    html += '</div><div style="font-size:1.1rem;font-weight:800;color:'+color+';">'+r.percent+'%</div></div>';
+  });
+  html += '</div><button class="btn-primary" onclick="resetQuiz()" style="margin-top:12px;">🔄 Wróć</button>';
+  c.innerHTML = html;
+}
+
 async function showQuizResults() {
   var c = document.getElementById('quiz-container');
   var snap = await db.collection('quizResults').orderBy('date','desc').limit(50).get();
@@ -865,23 +885,33 @@ function listenLibrary() {
 
 function renderLibrary() {
   var grid = document.getElementById('library-grid');
-  var enabledLib = myEnabledQuizzes; // reuse enabledQuizzes for library access too
   if (!libraryItems.length) {
     grid.innerHTML = '<div class="empty-state"><span class="empty-icon">📚</span><h3>Brak materiałów</h3><p>Materiały pojawią się gdy admin je doda.</p></div>';
     return;
   }
+  var isAdmin = userRole==='admin';
   var isPrivileged = userRole==='admin'||userRole==='instructor';
-  grid.innerHTML = libraryItems.map(item => {
-    var unlocked = isPrivileged || (item.unlockedFor||[]).includes(currentUser.uid);
-    return '<div class="library-item">' +
-      '<div class="library-icon">📄</div>' +
-      '<div class="library-info"><div class="library-title">' + item.title + '</div><div class="library-cat">' + (item.category||'') + '</div></div>' +
-      (unlocked
-        ? '<a href="' + item.url + '" target="_blank" class="library-btn">📥 Pobierz</a>'
-        : '<div class="library-locked">🔒 Zablokowany</div>') +
-      (isPrivileged ? ' <button class="btn-delete" onclick="deleteLibItem(\'' + item.id + '\')" style="margin-left:6px;">🗑</button>' : '') +
-      '</div>';
-  }).join('');
+  // Grupuj po kategorii
+  var groups = {};
+  libraryItems.forEach(function(item){
+    var cat = item.category || 'Inne';
+    if (!groups[cat]) groups[cat] = [];
+    groups[cat].push(item);
+  });
+  var html = '';
+  Object.keys(groups).forEach(function(cat){
+    html += '<div style="font-size:0.68rem;font-weight:800;color:var(--text-dim);letter-spacing:1.5px;text-transform:uppercase;margin:12px 0 6px;">'+cat+'</div>';
+    groups[cat].forEach(function(item){
+      var unlocked = isPrivileged || (item.unlockedFor||[]).includes(currentUser.uid);
+      html += '<div class="library-item">'+
+        '<div class="library-icon">📄</div>'+
+        '<div class="library-info"><div class="library-title">'+item.title+'</div></div>'+
+        (unlocked ? '<a href="'+item.url+'" target="_blank" class="library-btn">📥 Pobierz</a>' : '<div class="library-locked">🔒</div>')+
+        (isAdmin ? ' <button class="btn-delete" onclick="deleteLibItem(\''+item.id+'\')" style="margin-left:6px;">🗑</button>' : '')+
+        '</div>';
+    });
+  });
+  grid.innerHTML = html;
 }
 
 function openPdfModal() {
@@ -917,8 +947,9 @@ let currentLang = 'pl';
 async function openProfile() {
   var snap = await userDocRef.get();
   var d = snap.data() || {};
-  document.getElementById('pf-role').value = userRole === 'instructor' ? (currentLang==='pl'?'Instruktor':'Instructor') : (currentLang==='pl'?'Kursant':'Student');
-  document.getElementById('pf-name').value = d.name || '';
+  document.getElementById('pf-role').value = userRole === 'admin' ? 'Admin' : userRole === 'instructor' ? 'Instruktor' : 'Kursant';
+  document.getElementById('pf-fname').value = d.firstName || d.name || '';
+  document.getElementById('pf-lname').value = d.lastName || '';
   document.getElementById('pf-email').value = d.email || '';
   document.getElementById('pf-phone').value = d.phone || '';
   document.getElementById('pf-certlevel').value = d.certLevel || '';
@@ -934,9 +965,10 @@ function closeProfileModalDirect() { document.getElementById('profile-modal').cl
 
 async function saveProfile() {
   await userDocRef.update({
-    name: document.getElementById('pf-name').value.trim(),
+    firstName: document.getElementById('pf-fname').value.trim(),
+    lastName: document.getElementById('pf-lname').value.trim(),
+    name: document.getElementById('pf-fname').value.trim() + ' ' + document.getElementById('pf-lname').value.trim(),
     phone: document.getElementById('pf-phone').value.trim(),
-    certLevel: document.getElementById('pf-certlevel').value.trim(),
     street: document.getElementById('pf-street').value.trim(),
     city: document.getElementById('pf-city').value.trim(),
     country: document.getElementById('pf-country').value.trim(),
