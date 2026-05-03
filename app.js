@@ -220,17 +220,21 @@ async function showApp(user) {
   const brandLogo = document.getElementById('brand-logo');
   const brandName = document.getElementById('brand-name');
   const brandSub = document.getElementById('brand-sub');
-  if (currentSchoolLogo === 'justadive') {
+  if (currentSchoolLogo && currentSchoolLogo.startsWith('data:')) {
+    brandLogo.src = currentSchoolLogo;
+    brandName.textContent = currentSchoolName || 'PSAI';
+    brandSub.textContent = '';
+  } else if (currentSchoolLogo === 'justadive') {
     brandLogo.src = 'JustaDive/logotyp negatyw.png';
     brandName.innerHTML = '<span class="just">Just</span> <span class="a">a</span> <span class="dive">dive</span>';
     brandSub.textContent = 'Twoja Szkoła Nurkowania';
   } else if (currentSchoolLogo === 'dive-app') {
     brandLogo.src = 'austronaut_logo.jpg';
     brandName.textContent = 'Dive App';
-    brandSub.textContent = 'Dive Logbook';
-  } else if (currentSchoolLogo) {
-    brandLogo.src = currentSchoolLogo;
-    brandName.textContent = currentSchoolName || 'Szkoła Nurkowa';
+    brandSub.textContent = '';
+  } else {
+    brandLogo.src = 'JustaDive/PSAI logo bez tła.png';
+    brandName.textContent = 'PSAI';
     brandSub.textContent = '';
   }
   const badge = document.getElementById('role-badge');
@@ -526,7 +530,8 @@ function renderCerts() {
               <div class="cert-back-detail">
                 ${c.number?'Certification # <strong>'+c.number+'</strong><br>':''}
                 ${c.date?fmtDate(c.date)+'<br>':''}
-                ${c.instructor?'Instructor: <strong>'+c.instructor+'</strong>':''}
+                ${c.instructor?'Instructor: <strong>'+c.instructor+'</strong><br>':''}
+                ${c.notes?'<em>'+c.notes+'</em>':''}
               </div>
             </div>
             ${c.photo?'<img src="'+c.photo+'" class="cert-back-photo">':''}
@@ -971,6 +976,7 @@ function renderLibrary() {
         '<div class="library-info"><div class="library-title">'+item.title+'</div></div>'+
         (unlocked ? '<a href="'+item.url+'" target="_blank" class="library-btn">📥 Pobierz</a>' : '<div class="library-locked">🔒</div>')+
         (isPrivileged ? ' <button class="library-btn" onclick="unlockLibItem(\''+item.id+'\')" style="margin-left:4px;">🔓 Udostępnij</button>' : '')+
+        (isAdmin ? ' <button class="library-btn" onclick="renameLibItem(\''+item.id+'\')" style="margin-left:4px;">✏️</button>' : '')+
         (isAdmin ? ' <button class="btn-delete" onclick="deleteLibItem(\''+item.id+'\')" style="margin-left:4px;">🗑</button>' : '')+
         '</div>';
     });
@@ -1017,6 +1023,13 @@ async function unlockLibItem(id) {
   showToast('✅ Materiał udostępniony!');
 }
 
+async function renameLibItem(id) {
+  var newName = prompt('Nowa nazwa materiału:');
+  if (!newName) return;
+  await db.collection('library').doc(id).update({ title: newName.trim() });
+  showToast('✅ Nazwa zmieniona');
+}
+
 // ─── Profil ───
 let currentLang = 'pl';
 
@@ -1034,6 +1047,14 @@ async function openProfile() {
   document.getElementById('pf-country').value = d.country || '';
   document.getElementById('pf-lang').value = d.lang || currentLang;
   document.getElementById('pf-avatar').src = d.avatar || document.getElementById('user-avatar').src;
+  // Logo szkoły — tylko instruktor/admin
+  var logoSection = document.getElementById('pf-logo-section');
+  if (userRole === 'instructor' || userRole === 'admin') {
+    logoSection.style.display = '';
+    document.getElementById('pf-school-logo').src = d.schoolLogo || 'JustaDive/PSAI logo bez tła.png';
+  } else {
+    logoSection.style.display = 'none';
+  }
   document.getElementById('profile-modal').classList.add('open');
 }
 function closeProfileModal(e) { if (e.target === document.getElementById('profile-modal')) closeProfileModalDirect(); }
@@ -1097,6 +1118,32 @@ function switchLang(lang) {
     if (userRole==='instructor') badge.textContent = lang==='pl'?'🏅 Instruktor':'🏅 Instructor';
     else badge.textContent = lang==='pl'?'🎓 Kursant':'🎓 Student';
   }
+}
+
+function uploadSchoolLogo(event) {
+  var file = event.target.files[0];
+  if (!file) return;
+  var reader = new FileReader();
+  reader.onload = function(e) {
+    var img = new Image();
+    img.onload = function() {
+      var canvas = document.createElement('canvas');
+      var size = 150;
+      canvas.width = size; canvas.height = size;
+      var ctx = canvas.getContext('2d');
+      var scale = Math.min(size/img.width, size/img.height);
+      var w = img.width*scale, h = img.height*scale;
+      ctx.drawImage(img, (size-w)/2, (size-h)/2, w, h);
+      var base64 = canvas.toDataURL('image/png', 0.9);
+      userDocRef.update({ schoolLogo: base64 }).then(function() {
+        document.getElementById('pf-school-logo').src = base64;
+        document.getElementById('brand-logo').src = base64;
+        showToast('✅ Logo zaktualizowane!');
+      });
+    };
+    img.src = e.target.result;
+  };
+  reader.readAsDataURL(file);
 }
 
 function changePassword() {
