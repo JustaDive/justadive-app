@@ -1034,6 +1034,8 @@ async function renameLibItem(id) {
 let currentLang = 'pl';
 
 async function openProfile() {
+  if (!userDocRef) { showToast('⚠️ Zaloguj się ponownie'); return; }
+  try {
   var snap = await userDocRef.get();
   var d = snap.data() || {};
   document.getElementById('pf-role').value = userRole === 'admin' ? 'Admin' : userRole === 'instructor' ? 'Instruktor' : 'Kursant';
@@ -1062,6 +1064,7 @@ async function openProfile() {
     logoSection.style.display = 'none';
   }
   document.getElementById('profile-modal').classList.add('open');
+  } catch(err) { showToast('⚠️ Błąd: ' + err.message); }
 }
 function closeProfileModal(e) { if (e.target === document.getElementById('profile-modal')) closeProfileModalDirect(); }
 function closeProfileModalDirect() { document.getElementById('profile-modal').classList.remove('open'); }
@@ -1072,7 +1075,7 @@ async function saveProfile() {
     lastName: document.getElementById('pf-lname').value.trim(),
     name: document.getElementById('pf-fname').value.trim() + ' ' + document.getElementById('pf-lname').value.trim(),
     phone: document.getElementById('pf-phone').value.trim(),
-    certNumber: (document.getElementById('pf-instnum')||{}).value ? document.getElementById('pf-instnum').value.trim() : undefined,
+    certNumber: document.getElementById('pf-instnum') ? document.getElementById('pf-instnum').value.trim() : '',
     street: document.getElementById('pf-street').value.trim(),
     city: document.getElementById('pf-city').value.trim(),
     country: document.getElementById('pf-country').value.trim(),
