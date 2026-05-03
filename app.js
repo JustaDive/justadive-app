@@ -114,6 +114,17 @@ function handleEmailAuth(e) {
 }
 function logOut() { auth.signOut(); }
 
+function resetPassword() {
+  var email = document.getElementById('f-email').value.trim();
+  if (!email) { showToast('⚠️ Wpisz email powyżej'); return; }
+  auth.sendPasswordResetEmail(email).then(function() {
+    showToast('✅ Link do resetu hasła wysłany na ' + email);
+  }).catch(function(e) {
+    document.getElementById('login-error').textContent = 'Nie znaleziono konta z tym emailem';
+    document.getElementById('login-error').style.display = 'block';
+  });
+}
+
 let pendingNewUser = null;
 
 auth.onAuthStateChanged(async user => {
@@ -273,8 +284,8 @@ function hideApp() {
 // ─── Tabs ───
 function switchTab(tab) {
   const names = {
-    '🎓 Certyfikaty':'certs','🧠 Egzaminy':'quiz','📚 Biblioteka':'library',
-    '📋 Logbook':'log','🛒 Sklep':'shop','👥 Kursanci':'manage','👥 Zarządzanie':'manage'
+    'Certyfikaty':'certs','Egzaminy':'quiz','Biblioteka':'library',
+    'Logbook':'log','Sklep':'shop','Kursanci':'manage','Zarządzanie':'manage'
   };
   document.querySelectorAll('.tab').forEach(t => {
     const n = names[t.textContent.trim()]; t.classList.toggle('active', n===tab);
@@ -978,6 +989,14 @@ function switchLang(lang) {
     if (userRole==='instructor') badge.textContent = lang==='pl'?'🏅 Instruktor':'🏅 Instructor';
     else badge.textContent = lang==='pl'?'🎓 Kursant':'🎓 Student';
   }
+}
+
+function changePassword() {
+  auth.sendPasswordResetEmail(currentUser.email).then(function() {
+    showToast('✅ Link do zmiany hasła wysłany na ' + currentUser.email);
+  }).catch(function() {
+    showToast('⚠️ Nie udało się wysłać linku');
+  });
 }
 
 // ─── Avatar ───

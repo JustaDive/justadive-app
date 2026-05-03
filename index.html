@@ -33,6 +33,7 @@
     <button class="login-toggle" onclick="toggleAuthMode()">
       <span id="toggle-mode-text">Nie masz konta? Zarejestruj się</span>
     </button>
+    <button class="login-toggle" onclick="resetPassword()" style="margin-top:6px;opacity:0.6;">Zapomniałem hasła</button>
     <div id="login-error" style="color:var(--danger);font-size:0.72rem;margin-top:12px;display:none;"></div>
   </div>
 </div>
@@ -48,15 +49,10 @@
       </div>
     </div>
     <div class="header-right">
-      <div class="header-stats">
-        <div class="stat"><div class="stat-num" id="total-dives">0</div><div class="stat-label">Nurkowań</div></div>
-        <div class="stat"><div class="stat-num" id="max-depth-stat">0m</div><div class="stat-label">Maks. głęb.</div></div>
-        <div class="stat"><div class="stat-num" id="total-time-stat">0h</div><div class="stat-label">Czas dna</div></div>
-      </div>
       <div class="role-badge" id="role-badge"></div>
       <div class="user-menu" id="user-menu" style="display:none;">
         <img id="user-avatar" class="user-avatar" alt="" title="Profil" onclick="openProfile()" style="cursor:pointer;">
-        <button class="lang-toggle" onclick="logOut()">↩</button>
+        <button class="lang-toggle" onclick="logOut()">Wyloguj</button>
       </div>
     </div>
   </div>
@@ -67,31 +63,31 @@
 
   <!-- Tabs: kursant -->
   <div class="tabs-bar" id="tabs-student">
-    <button class="tab active" onclick="switchTab('certs')">🎓 Certyfikaty</button>
-    <button class="tab" onclick="switchTab('quiz')">🧠 Egzaminy</button>
-    <button class="tab" onclick="switchTab('library')">📚 Biblioteka</button>
-    <button class="tab" onclick="switchTab('log')">📋 Logbook</button>
-    <button class="tab" onclick="switchTab('shop')">🛒 Sklep</button>
+    <button class="tab active" onclick="switchTab('certs')">Certyfikaty</button>
+    <button class="tab" onclick="switchTab('quiz')">Egzaminy</button>
+    <button class="tab" onclick="switchTab('library')">Biblioteka</button>
+    <button class="tab" onclick="switchTab('log')">Logbook</button>
+    <button class="tab" onclick="switchTab('shop')">Sklep</button>
   </div>
 
   <!-- Tabs: instruktor -->
   <div class="tabs-bar" id="tabs-instructor" style="display:none;">
-    <button class="tab active" onclick="switchTab('certs')">🎓 Certyfikaty</button>
-    <button class="tab" onclick="switchTab('quiz')">🧠 Egzaminy</button>
-    <button class="tab" onclick="switchTab('library')">📚 Biblioteka</button>
-    <button class="tab" onclick="switchTab('log')">📋 Logbook</button>
-    <button class="tab" onclick="switchTab('shop')">🛒 Sklep</button>
-    <button class="tab" onclick="switchTab('manage')">👥 Kursanci</button>
+    <button class="tab active" onclick="switchTab('certs')">Certyfikaty</button>
+    <button class="tab" onclick="switchTab('quiz')">Egzaminy</button>
+    <button class="tab" onclick="switchTab('library')">Biblioteka</button>
+    <button class="tab" onclick="switchTab('log')">Logbook</button>
+    <button class="tab" onclick="switchTab('shop')">Sklep</button>
+    <button class="tab" onclick="switchTab('manage')">Kursanci</button>
   </div>
 
   <!-- Tabs: admin -->
   <div class="tabs-bar" id="tabs-admin" style="display:none;">
-    <button class="tab active" onclick="switchTab('certs')">🎓 Certyfikaty</button>
-    <button class="tab" onclick="switchTab('quiz')">🧠 Egzaminy</button>
-    <button class="tab" onclick="switchTab('library')">📚 Biblioteka</button>
-    <button class="tab" onclick="switchTab('log')">📋 Logbook</button>
-    <button class="tab" onclick="switchTab('shop')">🛒 Sklep</button>
-    <button class="tab" onclick="switchTab('manage')">👥 Zarządzanie</button>
+    <button class="tab active" onclick="switchTab('certs')">Certyfikaty</button>
+    <button class="tab" onclick="switchTab('quiz')">Egzaminy</button>
+    <button class="tab" onclick="switchTab('library')">Biblioteka</button>
+    <button class="tab" onclick="switchTab('log')">Logbook</button>
+    <button class="tab" onclick="switchTab('shop')">Sklep</button>
+    <button class="tab" onclick="switchTab('manage')">Zarządzanie</button>
   </div>
 
   <!-- Biblioteka -->
@@ -143,6 +139,11 @@
     </div>
     <!-- Lista nurkowań -->
     <div style="margin-top:16px;">
+      <div class="header-stats" style="margin-bottom:12px;">
+        <div class="stat"><div class="stat-num" id="total-dives">0</div><div class="stat-label">Nurkowań</div></div>
+        <div class="stat"><div class="stat-num" id="max-depth-stat">0m</div><div class="stat-label">Maks. głęb.</div></div>
+        <div class="stat"><div class="stat-num" id="total-time-stat">0h</div><div class="stat-label">Czas dna</div></div>
+      </div>
       <div class="filters">
         <input type="text" class="search-input" id="search-input" placeholder="🔍 Szukaj miejsca, lokalizacji..." oninput="renderDives()">
         <select class="filter-select" id="filter-type" onchange="renderDives()">
@@ -350,13 +351,13 @@
       <div class="form-group full"><label id="lbl-pf-name">Imię i nazwisko</label><input type="text" id="pf-name" placeholder="Jan Kowalski"></div>
       <div class="form-group full"><label>Email</label><input type="email" id="pf-email" disabled style="opacity:0.6;"></div>
       <div class="form-group"><label id="lbl-pf-phone">Telefon</label><input type="tel" id="pf-phone" placeholder="+48 600 000 000"></div>
-      <div class="form-group"><label id="lbl-pf-certlevel">Poziom certyfikatu</label><input type="text" id="pf-certlevel" placeholder="np. Open Water Diver"></div>
       <div class="form-group"><label id="lbl-pf-street">Ulica</label><input type="text" id="pf-street" placeholder="ul. Nurkowa 1"></div>
       <div class="form-group"><label id="lbl-pf-city">Miasto</label><input type="text" id="pf-city" placeholder="Warszawa"></div>
       <div class="form-group"><label id="lbl-pf-country">Kraj</label><input type="text" id="pf-country" placeholder="Polska"></div>
       <div class="form-group full"><label id="lbl-pf-lang">Język / Language</label>
         <select id="pf-lang" onchange="switchLang(this.value)"><option value="pl">🇵🇱 Polski</option><option value="en">🇬🇧 English</option></select>
       </div>
+      <div class="form-group full"><button class="btn-delete" onclick="changePassword()" style="width:100%;text-align:center;">🔑 Zmień hasło</button></div>
     </div>
     <button class="btn-primary" onclick="saveProfile()" style="margin-top:12px;">💾 <span class="t" data-pl="ZAPISZ PROFIL" data-en="SAVE PROFILE">ZAPISZ PROFIL</span></button>
   </div>
