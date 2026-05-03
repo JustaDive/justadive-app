@@ -540,59 +540,77 @@ function renderCerts() {
   }).join('');
 }
 
-let certPhotoBase64 = '';
-
-function previewCertPhoto(event) {
-  const file = event.target.files[0];
-  if (!file) return;
-  const reader = new FileReader();
-  reader.onload = function(e) {
-    const img = new Image();
-    img.onload = function() {
-      const canvas = document.createElement('canvas');
-      const max = 200;
-      let w = img.width, h = img.height;
-      if (w > h) { h = Math.round(h * max / w); w = max; }
-      else { w = Math.round(w * max / h); h = max; }
-      canvas.width = w; canvas.height = h;
-      canvas.getContext('2d').drawImage(img, 0, 0, w, h);
-      certPhotoBase64 = canvas.toDataURL('image/jpeg', 0.7);
-      const preview = document.getElementById('cf-photo-preview');
-      preview.src = certPhotoBase64;
-      preview.style.display = 'block';
-    };
-    img.src = e.target.result;
-  };
-  reader.readAsDataURL(file);
-}
+let allInstructors = [];
 
 function openCertModal() {
-  ['cf-level','cf-number','cf-name','cf-instructor'].forEach(id=>document.getElementById(id).value='');
-  document.getElementById('cf-agency').value='PSAI';
-  document.getElementById('cf-date').value='';
-  document.getElementById('cf-photo').value='';
-  document.getElementById('cf-photo-preview').style.display='none';
-  certPhotoBase64 = '';
-  const sel = document.getElementById('cf-student');
-  sel.innerHTML = students.map(s=>'<option value="'+s.uid+'">'+(s.name||s.email)+'</option>').join('');
+  document.getElementById('cf-number').value = '';
+  document.getElementById('cf-date').value = '';
+  document.getElementById('cf-notes').value = '';
+  // Wypełnij listę kursantów
+  var sel = document.getElementById('cf-student');
+  sel.innerHTML = students.map(function(s){
+    var name = ((s.firstName||'')+' '+(s.lastName||'')).trim() || s.name || s.email;
+    return '<option value="'+s.uid+'" data-fname="'+(s.firstName||'')+'" data-lname="'+(s.lastName||'')+'">'+name+' ('+s.email+')</option>';
+  }).join('');
+  fillCertStudent();
+  // Wypełnij listę kursów
+  var levelSel = document.getElementById('cf-level');
+  levelSel.innerHTML = '<option value="">— Wybierz kurs —</option>' + Object.values(defaultQuizCategories).map(function(c){ return '<option value="'+c.name+'">'+c.name+'</option>'; }).join('');
+  // Wypełnij listę instruktorów
+  loadInstructorsForCert();
   document.getElementById('cert-modal').classList.add('open');
 }
+
+async function loadInstructorsForCert() {
+  var snap = await db.collection('users').where('role','in',['instructor','admin']).get();
+  allInstructors = snap.docs.map(function(doc){ return {uid:doc.id, ...doc.data()}; });
+  var sel = document.getElementById('cf-instructor-sel');
+  sel.innerHTML = allInstructors.map(function(inst){
+    var name = ((inst.firstName||'')+' '+(inst.lastName||'')).trim() || inst.name || inst.email;
+    return '<option value="'+inst.uid+'" data-num="'+(inst.certNumber||inst.uid.substring(0,6))+'">'+name+'</option>';
+  }).join('');
+  sel.onchange = function(){ 
+    var opt = sel.options[sel.selectedIndex];
+    document.getElementById('cf-instructor-num').value = opt?opt.dataset.num||'':'';
+  };
+  if (sel.options.length) sel.onchange();
+}
+
+function fillCertStudent() {
+  var sel = document.getElementById('cf-student');
+  var opt = sel.options[sel.selectedIndex];
+  if (opt) {
+    document.getElementById('cf-fname').value = opt.dataset.fname || '';
+    document.getElementById('cf-lname').value = opt.dataset.lname || '';
+  }
+}
+
 function closeCertModal(e){if(e.target===document.getElementById('cert-modal'))closeCertModalDirect();}
 function closeCertModalDirect(){document.getElementById('cert-modal').classList.remove('open');}
 
 async function saveCert() {
-  const level = document.getElementById('cf-level').value.trim();
-  if (!level){showToast('⚠️ Podaj poziom/kurs');return;}
-  const studentUid = document.getElementById('cf-student').value;
+  var level = document.getElementById('cf-level').value;
+  if (!level){showToast('⚠️ Wybierz kurs');return;}
+  var studentUid = document.getElementById('cf-student').value;
   if (!studentUid){showToast('⚠️ Wybierz kursanta');return;}
+  var instSel = document.getElementById('cf-instructor-sel');
+  var instOpt = instSel.options[instSel.selectedIndex];
+  var instName = instOpt ? instOpt.textContent : '';
+  var instNum = document.getElementById('cf-instructor-num').value;
+  // Pobierz zdjęcie kursanta z profilu
+  var studentSnap = await db.collection('users').doc(studentUid).get();
+  var studentData = studentSnap.data() || {};
+  var photo = studentData.avatar || '';
   await db.collection('users').doc(studentUid).collection('certs').add({
-    agency:document.getElementById('cf-agency').value, level,
-    number:document.getElementById('cf-number').value.trim(),
-    date:document.getElementById('cf-date').value,
-    name:document.getElementById('cf-name').value.trim(),
-    instructor:document.getElementById('cf-instructor').value.trim(),
-    photo: certPhotoBase64 || '',
-    studentUid
+    agency: 'PSAI',
+    level: level,
+    number: document.getElementById('cf-number').value.trim(),
+    date: document.getElementById('cf-date').value,
+    name: (document.getElementById('cf-fname').value + ' ' + document.getElementById('cf-lname').value).trim(),
+    instructor: instName + (instNum ? ' #'+instNum : ''),
+    notes: document.getElementById('cf-notes').value.trim(),
+    photo: photo,
+    studentUid: studentUid
   });
   closeCertModalDirect(); showToast('✅ Certyfikat dodany!');
 }
@@ -698,6 +716,7 @@ function renderQuizCategories() {
   }).join('');
   if (isAdmin) {
     html += '<div class="quiz-cat" onclick="openUploadQuiz()" style="cursor:pointer;"><span class="quiz-cat-icon">📂</span><div class="quiz-cat-name">Załaduj pytania (TXT)</div></div>';
+    html += '<div class="quiz-cat" onclick="downloadQuizTxt()" style="cursor:pointer;"><span class="quiz-cat-icon">📥</span><div class="quiz-cat-name">Pobierz pytania (TXT)</div></div>';
   }
   if (isPriv) {
     html += '<div class="quiz-cat" onclick="showQuizResults()" style="cursor:pointer;"><span class="quiz-cat-icon">📊</span><div class="quiz-cat-name">Wyniki kursantów</div></div>';
@@ -754,6 +773,26 @@ async function uploadQuizTxt(event) {
   renderQuizCategories();
   showToast('✅ Załadowano '+questions.length+' pytań do '+catName);
   event.target.value = '';
+}
+
+function downloadQuizTxt() {
+  var catKey = prompt('Podaj klucz kategorii (np. owsd):');
+  if (!catKey || !quizData[catKey]) { showToast('⚠️ Nie znaleziono kategorii'); return; }
+  var cat = quizData[catKey];
+  var letters = ['a','b','c','d'];
+  var txt = cat.name + '\n\n';
+  (cat.questions||[]).forEach(function(q, i){
+    txt += (i+1) + '. ' + q.q + '\n';
+    q.a.forEach(function(a, j){
+      txt += (j===q.c?'*':'') + letters[j] + '. ' + a + '\n';
+    });
+    txt += '\n';
+  });
+  var blob = new Blob([txt], {type:'text/plain'});
+  var a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = catKey + '.txt';
+  a.click();
 }
 
 function parseTxtQuestions(text) {
@@ -931,7 +970,8 @@ function renderLibrary() {
         '<div class="library-icon">📄</div>'+
         '<div class="library-info"><div class="library-title">'+item.title+'</div></div>'+
         (unlocked ? '<a href="'+item.url+'" target="_blank" class="library-btn">📥 Pobierz</a>' : '<div class="library-locked">🔒</div>')+
-        (isAdmin ? ' <button class="btn-delete" onclick="deleteLibItem(\''+item.id+'\')" style="margin-left:6px;">🗑</button>' : '')+
+        (isPrivileged ? ' <button class="library-btn" onclick="unlockLibItem(\''+item.id+'\')" style="margin-left:4px;">🔓 Udostępnij</button>' : '')+
+        (isAdmin ? ' <button class="btn-delete" onclick="deleteLibItem(\''+item.id+'\')" style="margin-left:4px;">🗑</button>' : '')+
         '</div>';
     });
   });
@@ -963,6 +1003,18 @@ async function deleteLibItem(id) {
   if (!confirm('Usunąć ten materiał?')) return;
   await db.collection('library').doc(id).delete();
   showToast('🗑 Materiał usunięty');
+}
+
+async function unlockLibItem(id) {
+  var email = prompt('Podaj email kursanta któremu chcesz udostępnić:');
+  if (!email) return;
+  var snap = await db.collection('users').where('email','==',email.trim().toLowerCase()).get();
+  if (snap.empty) { showToast('⚠️ Nie znaleziono kursanta'); return; }
+  var uid = snap.docs[0].id;
+  await db.collection('library').doc(id).update({
+    unlockedFor: firebase.firestore.FieldValue.arrayUnion(uid)
+  });
+  showToast('✅ Materiał udostępniony!');
 }
 
 // ─── Profil ───
