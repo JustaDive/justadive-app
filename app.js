@@ -572,7 +572,7 @@ async function loadInstructorsForCert() {
   var sel = document.getElementById('cf-instructor-sel');
   sel.innerHTML = allInstructors.map(function(inst){
     var name = ((inst.firstName||'')+' '+(inst.lastName||'')).trim() || inst.name || inst.email;
-    return '<option value="'+inst.uid+'" data-num="'+(inst.certNumber||inst.uid.substring(0,6))+'">'+name+'</option>';
+    return '<option value="'+inst.uid+'" data-num="'+(inst.certNumber||'')+'">'+name+'</option>';
   }).join('');
   sel.onchange = function(){ 
     var opt = sel.options[sel.selectedIndex];
@@ -1041,7 +1041,13 @@ async function openProfile() {
   document.getElementById('pf-lname').value = d.lastName || '';
   document.getElementById('pf-email').value = d.email || '';
   document.getElementById('pf-phone').value = d.phone || '';
-  document.getElementById('pf-certlevel').value = d.certLevel || '';
+  var instNumSection = document.getElementById('pf-instnum-section');
+  if (userRole === 'instructor' || userRole === 'admin') {
+    instNumSection.style.display = '';
+    document.getElementById('pf-instnum').value = d.certNumber || '';
+  } else {
+    instNumSection.style.display = 'none';
+  }
   document.getElementById('pf-street').value = d.street || '';
   document.getElementById('pf-city').value = d.city || '';
   document.getElementById('pf-country').value = d.country || '';
@@ -1066,6 +1072,7 @@ async function saveProfile() {
     lastName: document.getElementById('pf-lname').value.trim(),
     name: document.getElementById('pf-fname').value.trim() + ' ' + document.getElementById('pf-lname').value.trim(),
     phone: document.getElementById('pf-phone').value.trim(),
+    certNumber: (document.getElementById('pf-instnum')||{}).value ? document.getElementById('pf-instnum').value.trim() : undefined,
     street: document.getElementById('pf-street').value.trim(),
     city: document.getElementById('pf-city').value.trim(),
     country: document.getElementById('pf-country').value.trim(),
