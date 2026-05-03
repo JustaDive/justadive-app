@@ -177,14 +177,25 @@ async function chooseRole(role) {
   currentSchoolName = '';
   currentSchoolLogo = '';
   currentLang = 'pl';
+  // Sprawdź zaproszenie
+  var inviteCode = new URLSearchParams(window.location.search).get('invite');
+  var instructorUid = '';
+  if (inviteCode) {
+    var invSnap = await db.collection('invites').doc(inviteCode).get();
+    if (invSnap.exists) {
+      instructorUid = invSnap.data().instructorUid || '';
+      await db.collection('invites').doc(inviteCode).delete();
+    }
+  }
   await userDocRef.set({
     email: user.email,
     name: user.displayName || user.email,
+    firstName: '', lastName: '',
     role: role,
     enabledQuizzes: [],
     schoolName: '',
     schoolLogo: '',
-    instructorUid: '',
+    instructorUid: instructorUid,
     createdAt: firebase.firestore.FieldValue.serverTimestamp()
   });
   showApp(user);
@@ -596,17 +607,30 @@ async function loadStudents() {
   const snap = await db.collection('users').where('instructorUid','==',currentUser.uid).get();
   students = snap.docs.map(doc=>({uid:doc.id,...doc.data()}));
 }
-async function addStudent() {
-  const email = document.getElementById('add-student-email').value.trim();
-  if (!email){showToast('⚠️ Podaj email kursanta');return;}
-  const snap = await db.collection('users').where('email','==',email).get();
-  if (snap.empty){showToast('⚠️ Nie znaleziono — kursant musi się najpierw zarejestrować.');return;}
-  const studentDoc = snap.docs[0];
-  // Przypisz kursanta do tego instruktora
-  await db.collection('users').doc(studentDoc.id).update({ instructorUid: currentUser.uid });
-  document.getElementById('add-student-email').value='';
-  await loadStudents(); renderStudents();
-  showToast('✅ Kursant przypisany!');
+async function inviteStudent() {
+  var email = document.getElementById('add-student-email').value.trim();
+  if (!email) { showToast('⚠️ Podaj email kursanta'); return; }
+  var snap = await db.collection('users').where('email','==',email).get();
+  if (!snap.empty) {
+    await db.collection('users').doc(snap.docs[0].id).update({ instructorUid: currentUser.uid });
+    document.getElementById('add-student-email').value = '';
+    await loadStudents(); renderStudents();
+    showToast('✅ Kursant przypisany!');
+    return;
+  }
+  var inviteCode = Math.random().toString(36).substring(2, 10);
+  await db.collection('invites').doc(inviteCode).set({
+    email: email, instructorUid: currentUser.uid, createdAt: new Date().toISOString()
+  });
+  var link = window.location.origin + window.location.pathname + '?invite=' + inviteCode;
+  document.getElementById('invite-link-url').value = link;
+  document.getElementById('invite-link-box').style.display = 'block';
+  showToast('✅ Link zaproszenia wygenerowany');
+}
+function copyInviteLink() {
+  var input = document.getElementById('invite-link-url');
+  input.select(); document.execCommand('copy');
+  showToast('📋 Link skopiowany!');
 }
 function renderStudents() {
   const el = document.getElementById('students-list');
