@@ -1026,18 +1026,47 @@ async function showQuizResults() {
   var c = document.getElementById('quiz-container');
   var snap = await db.collection('quizResults').orderBy('date','desc').limit(50).get();
   if (snap.empty) { c.innerHTML = '<div class="card-title">📊 <span class="accent">Wyniki</span></div><div class="empty-state"><h3>Brak wyników</h3></div><button class="btn-primary" onclick="resetQuiz()">🔄 Wróć</button>'; return; }
+  var results = [];
+  snap.forEach(function(doc){ results.push(doc.data()); });
+  window._quizResults = results;
   var html = '<div class="card-title">📊 <span class="accent">Wyniki kursantów</span></div><div style="max-height:60vh;overflow-y:auto;">';
-  snap.forEach(function(doc){
-    var r = doc.data();
+  results.forEach(function(r, idx){
     var color = r.percent>=80?'#22c55e':r.percent>=50?'#f59e0b':'var(--danger)';
-    var subject = encodeURIComponent('Wynik egzaminu: ' + r.categoryName + ' - ' + r.percent + '%');
-    var body = encodeURIComponent('Cześć ' + (r.userName||'') + ',\n\nTwój wynik egzaminu:\nKategoria: ' + r.categoryName + '\nWynik: ' + r.score + '/' + r.total + ' (' + r.percent + '%)\nData: ' + (r.date||'').substring(0,10) + (r.errors&&r.errors.length ? '\n\nBłędy:\n' + r.errors.map(function(e){return '- ' + e.q + '\n  Twoja: ' + e.given + '\n  Poprawna: ' + e.correct;}).join('\n') : '') + '\n\nPozdrawiam');
-    var mailto = 'mailto:' + (r.userEmail||'') + '?subject=' + subject + '&body=' + body;
-    html += '<div class="student-card" style="cursor:pointer;margin-bottom:6px;" onclick="window.open(\''+mailto+'\')"><div class="student-info"><div class="student-name">'+r.userName+'</div><div class="student-email">'+r.categoryName+' · '+(r.date||'').substring(0,10)+' · ✉️ kliknij aby wysłać email</div>';
+    html += '<div class="student-card" style="cursor:pointer;margin-bottom:6px;" onclick="showResultDetail('+idx+')"><div class="student-info"><div class="student-name">'+r.userName+'</div><div class="student-email">'+r.categoryName+' · '+(r.date||'').substring(0,10)+'</div>';
     if (r.errors&&r.errors.length) html += '<div style="font-size:0.6rem;color:var(--danger);margin-top:2px;">'+r.errors.length+' błędów</div>';
     html += '</div><div style="font-size:1.1rem;font-weight:800;color:'+color+';">'+r.percent+'%</div></div>';
   });
   html += '</div><button class="btn-primary" onclick="resetQuiz()" style="margin-top:12px;">🔄 Wróć</button>';
+  c.innerHTML = html;
+}
+
+function showResultDetail(idx) {
+  var r = window._quizResults[idx];
+  if (!r) return;
+  var c = document.getElementById('quiz-container');
+  var color = r.percent>=80?'#22c55e':r.percent>=50?'#f59e0b':'var(--danger)';
+  var html = '<div style="margin-bottom:12px;"><button class="library-btn" onclick="showQuizResults()">← Wróć do listy</button></div>';
+  html += '<div style="text-align:center;margin-bottom:16px;"><div style="font-size:0.72rem;color:var(--text-dim);">'+r.categoryName+' · '+(r.date||'').substring(0,10)+'</div>';
+  html += '<div style="font-size:1.4rem;font-weight:900;">'+r.userName+'</div>';
+  html += '<div style="font-size:2rem;font-weight:900;color:'+color+';margin-top:4px;">'+r.percent+'%</div>';
+  html += '<div style="font-size:0.78rem;color:var(--text-dim);">'+r.score+'/'+r.total+' poprawnych</div></div>';
+  if (r.errors && r.errors.length) {
+    html += '<div style="font-size:0.72rem;font-weight:700;color:var(--danger);margin-bottom:8px;">Błędy ('+r.errors.length+'):</div>';
+    r.errors.forEach(function(e){
+      html += '<div style="background:var(--bg-input);border:1px solid var(--border);border-radius:8px;padding:10px;margin-bottom:6px;font-size:0.75rem;">';
+      html += '<div style="color:var(--white);font-weight:700;margin-bottom:4px;">'+e.q+'</div>';
+      html += '<div style="color:var(--danger);">✗ '+e.given+'</div>';
+      html += '<div style="color:#22c55e;">✓ '+e.correct+'</div>';
+      html += '</div>';
+    });
+  } else {
+    html += '<div style="text-align:center;color:#22c55e;font-weight:700;">Brak błędów — wszystko poprawnie!</div>';
+  }
+  // Przycisk email
+  var subject = encodeURIComponent('Wynik egzaminu: ' + r.categoryName + ' - ' + r.percent + '%');
+  var body = encodeURIComponent('Cześć ' + (r.userName||'') + ',\n\nTwój wynik egzaminu:\nKategoria: ' + r.categoryName + '\nWynik: ' + r.score + '/' + r.total + ' (' + r.percent + '%)\nData: ' + (r.date||'').substring(0,10) + (r.errors&&r.errors.length ? '\n\nBłędy:\n' + r.errors.map(function(e){return '- ' + e.q + '\n  Twoja: ' + e.given + '\n  Poprawna: ' + e.correct;}).join('\n') : '') + '\n\nPozdrawiam');
+  var mailto = 'mailto:' + (r.userEmail||'') + '?subject=' + subject + '&body=' + body;
+  html += '<a href="'+mailto+'" class="btn-primary" style="display:block;text-align:center;margin-top:16px;text-decoration:none;">✉️ Wyślij wynik emailem</a>';
   c.innerHTML = html;
 }
 
