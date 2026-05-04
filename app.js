@@ -578,11 +578,11 @@ function renderCerts() {
         return name.indexOf(q) >= 0;
       });
     }
-    var html = '<div style="display:flex;gap:8px;margin-bottom:10px;align-items:center;"><input type="text" id="cert-search" class="search-input" placeholder="Szukaj kursanta..." oninput="renderCerts()" value="'+searchVal+'" style="flex:1;"><button class="library-btn" onclick="certSortAsc=!certSortAsc;renderCerts();">A-Z ↕</button></div>';
-    html += sorted.map(function(s) {
+    var html = '<div style="display:flex;gap:8px;margin-bottom:10px;align-items:center;"><input type="text" id="cert-search" class="search-input" placeholder="Szukaj kursanta..." oninput="renderCertsFiltered()" value="'+searchVal+'" style="flex:1;"><button class="library-btn" onclick="certSortAsc=!certSortAsc;renderCertsFiltered();">A-Z ↕</button></div>';
+    html += '<div id="cert-student-list">' + sorted.map(function(s) {
       var name = ((s.firstName||'')+ ' '+(s.lastName||'')).trim() || s.name || s.email;
       return '<div class="student-card" onclick="viewStudentCerts(\''+s.uid+'\')"><div class="student-info"><div class="student-name">'+name+'</div><div class="student-email">'+s.email+'</div></div><div style="color:var(--blue);font-size:0.8rem;">→</div></div>';
-    }).join('');
+    }).join('') + '</div>';
     grid.innerHTML = html;
     return;
   }
@@ -604,6 +604,29 @@ function renderCerts() {
 function viewStudentCerts(uid) {
   certsViewStudent = uid;
   renderCerts();
+}
+
+function renderCertsFiltered() {
+  var searchVal = (document.getElementById('cert-search')||{}).value || '';
+  var sorted = students.slice().sort(function(a,b){
+    var na = ((a.firstName||'')+' '+(a.lastName||'')).trim() || a.name || a.email;
+    var nb = ((b.firstName||'')+' '+(b.lastName||'')).trim() || b.name || b.email;
+    return certSortAsc ? na.localeCompare(nb) : nb.localeCompare(na);
+  });
+  if (searchVal) {
+    var q = searchVal.toLowerCase();
+    sorted = sorted.filter(function(s){
+      var name = ((s.firstName||'')+' '+(s.lastName||'')+' '+s.email+' '+(s.name||'')).toLowerCase();
+      return name.indexOf(q) >= 0;
+    });
+  }
+  var listEl = document.getElementById('cert-student-list');
+  if (listEl) {
+    listEl.innerHTML = sorted.map(function(s) {
+      var name = ((s.firstName||'')+ ' '+(s.lastName||'')).trim() || s.name || s.email;
+      return '<div class="student-card" onclick="viewStudentCerts(\''+s.uid+'\')"><div class="student-info"><div class="student-name">'+name+'</div><div class="student-email">'+s.email+'</div></div><div style="color:var(--blue);font-size:0.8rem;">→</div></div>';
+    }).join('');
+  }
 }
 
 function renderCertCards(certsList) {
