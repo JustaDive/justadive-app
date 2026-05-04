@@ -169,10 +169,11 @@ async function loadUserProfile(user) {
   const snap = await userDocRef.get();
 
   if (!snap.exists) {
+    // Nowy użytkownik = kursant
     pendingNewUser = user;
     document.getElementById('login-screen').style.display = 'none';
-    document.getElementById('role-modal').classList.add('open');
-    return false;
+    await chooseRole('student');
+    return true;
   } else {
     const d = snap.data();
     // biuro@justadive.pl = admin
