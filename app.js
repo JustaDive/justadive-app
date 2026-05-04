@@ -177,7 +177,7 @@ async function loadUserProfile(user) {
     const d = snap.data();
     // biuro@justadive.pl = admin
     const email = (user.email||'').toLowerCase();
-    if (email === 'biuro@justadive.pl' && d.role !== 'admin') {
+    if ((email === 'biuro@justadive.pl' || email === 'damianbiniarz@gmail.com') && d.role !== 'admin') {
       await userDocRef.update({ role: 'admin' });
       d.role = 'admin';
     }
