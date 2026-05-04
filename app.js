@@ -1010,15 +1010,42 @@ async function showMyResults() {
   var c = document.getElementById('quiz-container');
   var snap = await db.collection('quizResults').where('userId','==',currentUser.uid).limit(20).get();
   if (snap.empty) { c.innerHTML = '<div class="card-title">📊 <span class="accent">Moje wyniki</span></div><div class="empty-state"><h3>Brak wyników</h3><p>Rozwiąż egzamin żeby zobaczyć wyniki.</p></div><button class="btn-primary" onclick="resetQuiz()">🔄 Wróć</button>'; return; }
-  var html = '<div class="card-title">📊 <span class="accent">Moje wyniki</span></div><div style="max-height:60vh;overflow-y:auto;">';
-  snap.forEach(function(doc){
-    var r = doc.data();
+  var results = [];
+  snap.forEach(function(doc){ results.push(doc.data()); });
+  window._myResults = results;
+  var html = '<div class="card-title">📊 <span class="accent">Moje wyniki</span></div><button class="library-btn" onclick="resetQuiz()" style="margin-bottom:12px;">← Egzaminy</button><div style="max-height:60vh;overflow-y:auto;">';
+  results.forEach(function(r, idx){
     var color = r.percent>=80?'#22c55e':r.percent>=50?'#f59e0b':'var(--danger)';
-    html += '<div class="student-card" style="cursor:default;margin-bottom:6px;"><div class="student-info"><div class="student-name">'+r.categoryName+'</div><div class="student-email">'+(r.date||'').substring(0,10)+' · '+r.score+'/'+r.total+'</div>';
+    html += '<div class="student-card" style="cursor:pointer;margin-bottom:6px;" onclick="showMyResultDetail('+idx+')"><div class="student-info"><div class="student-name">'+r.categoryName+'</div><div class="student-email">'+(r.date||'').substring(0,10)+' · '+r.score+'/'+r.total+'</div>';
     if (r.errors&&r.errors.length) html += '<div style="font-size:0.6rem;color:var(--danger);margin-top:2px;">'+r.errors.length+' błędów</div>';
     html += '</div><div style="font-size:1.1rem;font-weight:800;color:'+color+';">'+r.percent+'%</div></div>';
   });
-  html += '</div><button class="btn-primary" onclick="resetQuiz()" style="margin-top:12px;">🔄 Wróć</button>';
+  html += '</div>';
+  c.innerHTML = html;
+}
+
+function showMyResultDetail(idx) {
+  var r = window._myResults[idx];
+  if (!r) return;
+  var c = document.getElementById('quiz-container');
+  var color = r.percent>=80?'#22c55e':r.percent>=50?'#f59e0b':'var(--danger)';
+  var html = '<div style="margin-bottom:12px;"><button class="library-btn" onclick="showMyResults()">← Wróć do wyników</button></div>';
+  html += '<div style="text-align:center;margin-bottom:16px;">';
+  html += '<div style="font-size:0.72rem;color:var(--text-dim);">'+r.categoryName+' · '+(r.date||'').substring(0,10)+'</div>';
+  html += '<div style="font-size:2rem;font-weight:900;color:'+color+';margin-top:4px;">'+r.percent+'%</div>';
+  html += '<div style="font-size:0.78rem;color:var(--text-dim);">'+r.score+'/'+r.total+' poprawnych</div></div>';
+  if (r.errors && r.errors.length) {
+    html += '<div style="font-size:0.72rem;font-weight:700;color:var(--danger);margin-bottom:8px;">Błędy ('+r.errors.length+'):</div>';
+    r.errors.forEach(function(e){
+      html += '<div style="background:var(--bg-input);border:1px solid var(--border);border-radius:8px;padding:10px;margin-bottom:6px;font-size:0.75rem;">';
+      html += '<div style="color:var(--white);font-weight:700;margin-bottom:4px;">'+e.q+'</div>';
+      html += '<div style="color:var(--danger);">✗ '+e.given+'</div>';
+      html += '<div style="color:#22c55e;">✓ '+e.correct+'</div>';
+      html += '</div>';
+    });
+  } else {
+    html += '<div style="text-align:center;color:#22c55e;font-weight:700;">Brak błędów!</div>';
+  }
   c.innerHTML = html;
 }
 
