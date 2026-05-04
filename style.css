@@ -302,6 +302,12 @@ details[open] .path-summary::before { content:'▼ '; }
   cursor:pointer; transition:all 0.2s; position:relative;
 }
 .quiz-cat:not(.disabled):hover { border-color:var(--blue); background:var(--bg-card-hover); }
+.quiz-cat.quiz-cat-action {
+  border-color:var(--blue); background:var(--blue-dim);
+}
+.quiz-cat.quiz-cat-action .quiz-cat-name { color:var(--blue); }
+.quiz-cat.quiz-cat-action:hover { background:var(--blue); }
+.quiz-cat.quiz-cat-action:hover .quiz-cat-name { color:#fff; }
 .quiz-cat.disabled { opacity:0.4; cursor:not-allowed; }
 .quiz-cat-icon { font-size:1.5rem; display:block; margin-bottom:4px; }
 .quiz-cat-name { font-size:0.68rem; font-weight:700; color:var(--text-dim); text-transform:uppercase; letter-spacing:0.5px; }

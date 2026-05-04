@@ -825,14 +825,14 @@ function renderQuizCategories() {
   // Przyciski funkcyjne — kafelki jak testy
   if (isAdmin || isPriv || userRole === 'student') {
     if (isAdmin) {
-      html += '<div class="quiz-cat" onclick="openUploadQuiz()" style="cursor:pointer;"><div class="quiz-cat-name">Załaduj pytania</div></div>';
-      html += '<div class="quiz-cat" onclick="downloadQuizTxt()" style="cursor:pointer;"><div class="quiz-cat-name">Pobierz pytania</div></div>';
+      html += '<div class="quiz-cat quiz-cat-action" onclick="openUploadQuiz()" style="cursor:pointer;"><div class="quiz-cat-name">Załaduj pytania</div></div>';
+      html += '<div class="quiz-cat quiz-cat-action" onclick="downloadQuizTxt()" style="cursor:pointer;"><div class="quiz-cat-name">Pobierz pytania</div></div>';
     }
     if (isPriv) {
-      html += '<div class="quiz-cat" onclick="showQuizResults()" style="cursor:pointer;"><div class="quiz-cat-name">Wyniki kursantów</div></div>';
+      html += '<div class="quiz-cat quiz-cat-action" onclick="showQuizResults()" style="cursor:pointer;"><div class="quiz-cat-name">Wyniki kursantów</div></div>';
     }
     if (userRole === 'student') {
-      html += '<div class="quiz-cat" onclick="showMyResults()" style="cursor:pointer;"><div class="quiz-cat-name">Moje wyniki</div></div>';
+      html += '<div class="quiz-cat quiz-cat-action" onclick="showMyResults()" style="cursor:pointer;"><div class="quiz-cat-name">Moje wyniki</div></div>';
     }
   }
   // Lista egzaminów — bez ikon
