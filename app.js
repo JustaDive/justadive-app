@@ -547,44 +547,81 @@ function closeModal(e){if(e.target===document.getElementById('modal'))closeModal
 function closeModalDirect(){document.getElementById('modal').classList.remove('open');}
 
 // ─── Certifications ───
+let certsViewStudent = null; // null = lista kursantów, uid = certyfikaty tego kursanta
+
 function renderCerts() {
   const grid = document.getElementById('certs-grid');
-  if (!certs.length) {
-    grid.innerHTML = '<div class="empty-state"><span class="empty-icon">🎓</span><h3>Brak certyfikatów</h3><p>'+(userRole==='instructor'?'Dodaj certyfikat kursantowi.':'Twój instruktor doda Ci certyfikat.')+'</p></div>';
+  const isPriv = userRole === 'admin' || userRole === 'instructor';
+
+  // Kursant — widzi swoje certyfikaty
+  if (!isPriv) {
+    if (!certs.length) {
+      grid.innerHTML = '<div class="empty-state"><span class="empty-icon">🎓</span><h3>Brak certyfikatów</h3><p>Twój instruktor doda Ci certyfikat.</p></div>';
+      return;
+    }
+    grid.innerHTML = renderCertCards(certs);
     return;
   }
-  grid.innerHTML = certs.map(c => {
-    const agency = (c.agency||'PSAI').toUpperCase();
-    return `<div>
-      <div class="cert-card">
-        <div class="cert-front">
-          <div class="cert-front-level">${c.level||'Diver'}</div>
-          <div class="cert-front-logo-wrap"><img src="JustaDive/PSAI logo bez tła.png" alt="PSAI" class="cert-front-logo"></div>
-          <div class="cert-front-bottom">Professional Scuba Association International</div>
-        </div>
-      </div>
-      <div class="cert-card" style="margin-top:8px;">
-        <div class="cert-back">
-          <div class="cert-back-header">${agency} ${c.level||'Certyfikat'}</div>
-          <div class="cert-back-body">
-            <img src="JustaDive/PSAI logo bez tła.png" alt="PSAI" class="cert-back-logo">
-            <div class="cert-back-info">
-              <div class="cert-back-name">${c.name||'—'}</div>
-              <div class="cert-back-detail">
-                ${c.number?'Certification # <strong>'+c.number+'</strong><br>':''}
-                ${c.date?fmtDate(c.date)+'<br>':''}
-                ${c.instructor?'Instructor: <strong>'+c.instructor+'</strong><br>':''}
-                ${c.notes?'<em>'+c.notes+'</em>':''}
-              </div>
-            </div>
-            ${c.photo?'<img src="'+c.photo+'" class="cert-back-photo">':''}
-          </div>
-          <div class="cert-back-footer">PSA INTERNATIONAL</div>
-          <div class="cert-back-iso">ISO 49001 Certified / www.psai.pl</div>
-        </div>
-      </div>
-      ${userRole==='admin'?'<div class="cert-actions"><button class="btn-delete" onclick="deleteCert(\''+c.id+'\')">🗑 Usuń</button></div>':''}
-    </div>`;
+
+  // Admin/Instruktor — lista kursantów lub certyfikaty wybranego
+  if (!certsViewStudent) {
+    // Pokaż listę kursantów
+    if (!students.length) {
+      grid.innerHTML = '<div class="empty-state"><span class="empty-icon">🎓</span><h3>Brak kursantów</h3><p>Dodaj kursanta w zakładce Zarządzanie/Kursanci.</p></div>';
+      return;
+    }
+    grid.innerHTML = students.map(function(s) {
+      var name = ((s.firstName||'')+ ' '+(s.lastName||'')).trim() || s.name || s.email;
+      return '<div class="student-card" onclick="viewStudentCerts(\''+s.uid+'\')"><div class="student-info"><div class="student-name">'+name+'</div><div class="student-email">'+s.email+'</div></div><div style="color:var(--blue);font-size:0.8rem;">→</div></div>';
+    }).join('');
+    return;
+  }
+
+  // Certyfikaty wybranego kursanta
+  var studentCerts = certs.filter(function(c){ return c.studentUid === certsViewStudent || (!c.studentUid && certsViewStudent === currentUser.uid); });
+  var studentData = students.find(function(s){ return s.uid === certsViewStudent; });
+  var studentName = studentData ? (((studentData.firstName||'')+' '+(studentData.lastName||'')).trim() || studentData.name || studentData.email) : '';
+
+  var html = '<div style="margin-bottom:12px;"><button class="library-btn" onclick="certsViewStudent=null;renderCerts();">← Wróć do listy</button> <span style="font-weight:700;margin-left:8px;">'+studentName+'</span></div>';
+  if (!studentCerts.length) {
+    html += '<div class="empty-state"><h3>Brak certyfikatów</h3></div>';
+  } else {
+    html += renderCertCards(studentCerts);
+  }
+  grid.innerHTML = html;
+}
+
+function viewStudentCerts(uid) {
+  certsViewStudent = uid;
+  renderCerts();
+}
+
+function renderCertCards(certsList) {
+  return certsList.map(function(c) {
+    var agency = (c.agency||'PSAI').toUpperCase();
+    return '<div>'+
+      '<div class="cert-card"><div class="cert-front">'+
+        '<div class="cert-front-level">'+(c.level||'Diver')+'</div>'+
+        '<div class="cert-front-logo-wrap"><img src="JustaDive/PSAI logo bez tła.png" alt="PSAI" class="cert-front-logo"></div>'+
+        '<div class="cert-front-bottom">Professional Scuba Association International</div>'+
+      '</div></div>'+
+      '<div class="cert-card" style="margin-top:8px;"><div class="cert-back">'+
+        '<div class="cert-back-header">'+agency+' '+(c.level||'Certyfikat')+'</div>'+
+        '<div class="cert-back-body">'+
+          '<img src="JustaDive/PSAI logo bez tła.png" alt="PSAI" class="cert-back-logo">'+
+          '<div class="cert-back-info"><div class="cert-back-name">'+(c.name||'—')+'</div><div class="cert-back-detail">'+
+            (c.number?'Certification # <strong>'+c.number+'</strong><br>':'')+
+            (c.date?fmtDate(c.date)+'<br>':'')+
+            (c.instructor?'Instructor: <strong>'+c.instructor+'</strong><br>':'')+
+            (c.notes?'<em>'+c.notes+'</em>':'')+
+          '</div></div>'+
+          (c.photo?'<img src="'+c.photo+'" class="cert-back-photo">':'')+
+        '</div>'+
+        '<div class="cert-back-footer">PSA INTERNATIONAL</div>'+
+        '<div class="cert-back-iso">ISO 49001 Certified / www.psai.pl</div>'+
+      '</div></div>'+
+      (userRole==='admin'?'<div class="cert-actions"><button class="btn-delete" onclick="deleteCert(\''+c.id+'\')">🗑 Usuń</button></div>':'')+
+    '</div>';
   }).join('');
 }
 
