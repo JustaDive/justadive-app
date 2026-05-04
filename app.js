@@ -795,28 +795,34 @@ function renderQuizCategories() {
   var el = document.getElementById('quiz-categories');
   var isPriv = userRole==='admin'||userRole==='instructor';
   var isAdmin = userRole==='admin';
-  var html = Object.entries(quizData).map(function(entry){
+  var html = '';
+  // Przyciski funkcyjne na górze
+  if (isAdmin) {
+    html += '<div style="display:flex;gap:8px;margin-bottom:14px;flex-wrap:wrap;">';
+    html += '<button class="library-btn" onclick="openUploadQuiz()">📂 Załaduj pytania</button>';
+    html += '<button class="library-btn" onclick="downloadQuizTxt()">📥 Pobierz pytania</button>';
+    html += '<button class="library-btn" onclick="showQuizResults()">📊 Wyniki kursantów</button>';
+    html += '</div>';
+  } else if (isPriv) {
+    html += '<div style="display:flex;gap:8px;margin-bottom:14px;flex-wrap:wrap;">';
+    html += '<button class="library-btn" onclick="showQuizResults()">📊 Wyniki kursantów</button>';
+    html += '</div>';
+  }
+  if (userRole === 'student') {
+    html += '<div style="margin-bottom:14px;"><button class="library-btn" onclick="showMyResults()">📊 Moje wyniki</button></div>';
+  }
+  // Lista egzaminów — bez ikon
+  html += Object.entries(quizData).map(function(entry){
     var k=entry[0], cat=entry[1];
     var ok = isPriv || (myEnabledQuizzes||[]).includes(k);
     var cnt = (cat.questions||[]).length;
     return '<div class="quiz-cat '+(ok&&cnt?'':'disabled')+'" '+(ok&&cnt?'onclick="startQuiz(\''+k+'\')"':'')+'>'+
-      '<span class="quiz-cat-icon">'+cat.icon+'</span>'+
       '<div class="quiz-cat-name">'+cat.name+'</div>'+
       '<div style="font-size:0.55rem;color:var(--text-muted);margin-top:2px;">'+cnt+' pytań</div>'+
       (ok?'':'<div class="quiz-locked">🔒</div>')+
-      (isAdmin&&cnt?'<div style="font-size:0.5rem;color:var(--text-muted);margin-top:2px;cursor:pointer;" onclick="event.stopPropagation();deleteQuizCategory(\''+k+'\')">🗑 usuń pytania</div>':'')+
+      (isAdmin&&cnt?'<div style="font-size:0.5rem;color:var(--text-muted);margin-top:2px;cursor:pointer;" onclick="event.stopPropagation();deleteQuizCategory(\''+k+'\')">🗑 usuń</div>':'')+
       '</div>';
   }).join('');
-  if (isAdmin) {
-    html += '<div class="quiz-cat" onclick="openUploadQuiz()" style="cursor:pointer;"><span class="quiz-cat-icon">📂</span><div class="quiz-cat-name">Załaduj pytania (TXT)</div></div>';
-    html += '<div class="quiz-cat" onclick="downloadQuizTxt()" style="cursor:pointer;"><span class="quiz-cat-icon">📥</span><div class="quiz-cat-name">Pobierz pytania (TXT)</div></div>';
-  }
-  if (isPriv) {
-    html += '<div class="quiz-cat" onclick="showQuizResults()" style="cursor:pointer;"><span class="quiz-cat-icon">📊</span><div class="quiz-cat-name">Wyniki kursantów</div></div>';
-  }
-  if (userRole === 'student') {
-    html += '<div class="quiz-cat" onclick="showMyResults()" style="cursor:pointer;"><span class="quiz-cat-icon">📊</span><div class="quiz-cat-name">Moje wyniki</div></div>';
-  }
   el.innerHTML = html;
 }
 
