@@ -275,7 +275,7 @@ async function showApp(user) {
     document.getElementById('btn-add-cert').style.display='';
     document.getElementById('btn-add-pdf').style.display='';
     document.getElementById('admin-role-section').style.display='';
-    loadAllUsers();
+    loadAllUsers().then(function(){ loadCertsForView(); });
   } else if (userRole==='instructor') {
     badge.textContent='🏅 Instruktor'; badge.className='role-badge instructor';
     document.getElementById('tabs-student').style.display='none';
@@ -284,7 +284,7 @@ async function showApp(user) {
     document.getElementById('btn-add-cert').style.display='none';
     document.getElementById('btn-add-pdf').style.display='none';
     document.getElementById('admin-role-section').style.display='none';
-    loadStudents();
+    loadStudents().then(function(){ loadCertsForView(); });
   } else {
     badge.textContent='🎓 Kursant'; badge.className='role-badge student';
     document.getElementById('tabs-student').style.display='flex';
@@ -305,19 +305,7 @@ async function showApp(user) {
   });
   if (unsubCerts) unsubCerts();
   if (userRole === 'admin' || userRole === 'instructor') {
-    // Poczekaj na załadowanie studentów, potem ładuj certyfikaty
-    setTimeout(async function() {
-      certs = [];
-      // Własne certyfikaty
-      var mySnap = await certsCol.get();
-      mySnap.forEach(function(doc) { certs.push({id:doc.id, ...doc.data()}); });
-      // Certyfikaty kursantów
-      for (var s of students) {
-        var sSnap = await db.collection('users').doc(s.uid).collection('certs').get();
-        sSnap.forEach(function(doc) { certs.push({id:doc.id, studentUid:s.uid, ...doc.data()}); });
-      }
-      if (document.getElementById('panel-certs').classList.contains('active')) renderCerts();
-    }, 1000);
+    // Certyfikaty ładowane w loadCertsForAdmin po załadowaniu studentów
   } else {
     unsubCerts = certsCol.orderBy('date','desc').onSnapshot(snap => {
       certs = snap.docs.map(doc=>({id:doc.id,...doc.data()}));
