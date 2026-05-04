@@ -705,6 +705,23 @@ async function saveCert() {
     studentUid: studentUid
   });
   closeCertModalDirect(); showToast('✅ Certyfikat dodany!');
+  // Odśwież listę certyfikatów
+  certsViewStudent = studentUid;
+  await loadCertsForView();
+  renderCerts();
+}
+
+async function loadCertsForView() {
+  if (userRole === 'admin' || userRole === 'instructor') {
+    certs = [];
+    for (var s of students) {
+      var sSnap = await db.collection('users').doc(s.uid).collection('certs').get();
+      sSnap.forEach(function(doc) { certs.push({id:doc.id, studentUid:s.uid, ...doc.data()}); });
+    }
+    // Własne certyfikaty
+    var mySnap = await certsCol.get();
+    mySnap.forEach(function(doc) { certs.push({id:doc.id, ...doc.data()}); });
+  }
 }
 async function deleteCert(id) {
   if(!confirm('Usunąć ten certyfikat?'))return;
