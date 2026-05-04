@@ -796,20 +796,20 @@ function renderQuizCategories() {
   var isPriv = userRole==='admin'||userRole==='instructor';
   var isAdmin = userRole==='admin';
   var html = '';
-  // Przyciski funkcyjne na górze
-  if (isAdmin) {
-    html += '<div style="display:flex;gap:8px;margin-bottom:14px;flex-wrap:wrap;">';
-    html += '<button class="library-btn" onclick="openUploadQuiz()">📂 Załaduj pytania</button>';
-    html += '<button class="library-btn" onclick="downloadQuizTxt()">📥 Pobierz pytania</button>';
-    html += '<button class="library-btn" onclick="showQuizResults()">📊 Wyniki kursantów</button>';
+  // Przyciski funkcyjne na górze — toolbar
+  if (isAdmin || isPriv || userRole === 'student') {
+    html += '<div class="quiz-toolbar">';
+    if (isAdmin) {
+      html += '<button class="quiz-toolbar-btn" onclick="openUploadQuiz()"><span>📂</span> Załaduj</button>';
+      html += '<button class="quiz-toolbar-btn" onclick="downloadQuizTxt()"><span>📥</span> Pobierz</button>';
+    }
+    if (isPriv) {
+      html += '<button class="quiz-toolbar-btn" onclick="showQuizResults()"><span>📊</span> Wyniki</button>';
+    }
+    if (userRole === 'student') {
+      html += '<button class="quiz-toolbar-btn" onclick="showMyResults()"><span>📊</span> Moje wyniki</button>';
+    }
     html += '</div>';
-  } else if (isPriv) {
-    html += '<div style="display:flex;gap:8px;margin-bottom:14px;flex-wrap:wrap;">';
-    html += '<button class="library-btn" onclick="showQuizResults()">📊 Wyniki kursantów</button>';
-    html += '</div>';
-  }
-  if (userRole === 'student') {
-    html += '<div style="margin-bottom:14px;"><button class="library-btn" onclick="showMyResults()">📊 Moje wyniki</button></div>';
   }
   // Lista egzaminów — bez ikon
   html += Object.entries(quizData).map(function(entry){

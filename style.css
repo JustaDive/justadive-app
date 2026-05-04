@@ -294,6 +294,21 @@ select option { background: #fff; color: #1a1a1a; }
 .quiz-cat-icon { font-size:1.5rem; display:block; margin-bottom:4px; }
 .quiz-cat-name { font-size:0.68rem; font-weight:700; color:var(--text-dim); text-transform:uppercase; letter-spacing:0.5px; }
 .quiz-locked { font-size:0.6rem; color:var(--text-muted); margin-top:4px; }
+/* ── Quiz toolbar ── */
+.quiz-toolbar {
+  display:flex; gap:6px; margin-bottom:16px; padding:10px 12px;
+  background:var(--bg-card); border:1px solid var(--border); border-radius:10px;
+  flex-wrap:wrap;
+}
+.quiz-toolbar-btn {
+  display:flex; align-items:center; gap:5px;
+  background:var(--bg-input); border:1px solid var(--border); border-radius:8px;
+  padding:8px 14px; color:var(--text); font-size:0.72rem; font-weight:700;
+  cursor:pointer; transition:all 0.2s; font-family:inherit;
+}
+.quiz-toolbar-btn:hover { border-color:var(--blue); color:var(--blue); background:var(--blue-dim); }
+.quiz-toolbar-btn span { font-size:0.9rem; }
+
 .quiz-progress { display:flex; align-items:center; gap:10px; margin-bottom:18px; }
 .quiz-progress-bar { flex:1; height:6px; background:var(--border); border-radius:3px; overflow:hidden; }
 .quiz-progress-fill { height:100%; background:var(--gradient); border-radius:3px; transition:width 0.4s; }
