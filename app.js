@@ -635,7 +635,7 @@ function openCertModal() {
   var sel = document.getElementById('cf-student');
   sel.innerHTML = students.map(function(s){
     var name = ((s.firstName||'')+' '+(s.lastName||'')).trim() || s.name || s.email;
-    return '<option value="'+s.uid+'" data-fname="'+(s.firstName||'')+'" data-lname="'+(s.lastName||'')+'">'+name+' ('+s.email+')</option>';
+    return '<option value="'+s.uid+'" data-fname="'+(s.firstName||'')+'" data-lname="'+(s.lastName||'')+'" data-name="'+(s.name||'')+'">'+name+' ('+s.email+')</option>';
   }).join('');
   fillCertStudent();
   // Wypełnij listę kursów
@@ -665,8 +665,16 @@ function fillCertStudent() {
   var sel = document.getElementById('cf-student');
   var opt = sel.options[sel.selectedIndex];
   if (opt) {
-    document.getElementById('cf-fname').value = opt.dataset.fname || '';
-    document.getElementById('cf-lname').value = opt.dataset.lname || '';
+    var fname = opt.dataset.fname || '';
+    var lname = opt.dataset.lname || '';
+    // Jeśli brak firstName/lastName, spróbuj rozdzielić name
+    if (!fname && !lname && opt.dataset.name) {
+      var parts = opt.dataset.name.split(' ');
+      fname = parts[0] || '';
+      lname = parts.slice(1).join(' ') || '';
+    }
+    document.getElementById('cf-fname').value = fname;
+    document.getElementById('cf-lname').value = lname;
   }
 }
 
