@@ -608,7 +608,7 @@ function renderCertCards(certsList) {
       '<div class="cert-card" style="margin-top:8px;"><div class="cert-back">'+
         '<div class="cert-back-header">'+agency+' '+(c.level||'Certyfikat')+'</div>'+
         '<div class="cert-back-body">'+
-          '<img src="JustaDive/PSAI logo bez tła.png" alt="PSAI" class="cert-back-logo">'+
+          '<img src="PSAI back.png" alt="PSAI" class="cert-back-logo">'+
           '<div class="cert-back-info"><div class="cert-back-name">'+(c.name||'—')+'</div><div class="cert-back-detail">'+
             (c.number?'Certification # <strong>'+c.number+'</strong><br>':'')+
             (c.date?fmtDate(c.date)+'<br>':'')+
