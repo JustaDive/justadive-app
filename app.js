@@ -99,6 +99,17 @@ function handleEmailAuth(e) {
   const pass = document.getElementById('f-password').value;
   const errEl = document.getElementById('login-error');
   errEl.style.display = 'none';
+  if (forgotMode) {
+    if (!email) { showToast('⚠️ Wpisz email'); return false; }
+    auth.sendPasswordResetEmail(email).then(function() {
+      showToast('✅ Link wysłany na ' + email);
+      exitForgotMode();
+    }).catch(function() {
+      errEl.textContent = 'Nie znaleziono konta z tym emailem';
+      errEl.style.display = 'block';
+    });
+    return false;
+  }
   (isRegisterMode ? auth.createUserWithEmailAndPassword(email, pass) : auth.signInWithEmailAndPassword(email, pass))
     .catch(err => {
       var msg = 'Zły login lub hasło';
@@ -123,6 +134,24 @@ function resetPassword() {
     document.getElementById('login-error').textContent = 'Nie znaleziono konta z tym emailem';
     document.getElementById('login-error').style.display = 'block';
   });
+}
+
+let forgotMode = false;
+function showForgotPassword() {
+  forgotMode = true;
+  document.getElementById('f-password').style.display = 'none';
+  document.getElementById('btn-email-submit').textContent = 'Wyślij link resetujący';
+  document.getElementById('btn-forgot').style.display = 'none';
+  document.getElementById('f-email').placeholder = 'Podaj swój email';
+  document.getElementById('f-email').focus();
+}
+
+function exitForgotMode() {
+  forgotMode = false;
+  document.getElementById('f-password').style.display = '';
+  document.getElementById('btn-email-submit').textContent = isRegisterMode ? 'Utwórz konto' : 'Zaloguj się';
+  document.getElementById('btn-forgot').style.display = '';
+  document.getElementById('f-email').placeholder = 'Email';
 }
 
 let pendingNewUser = null;
