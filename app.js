@@ -597,10 +597,12 @@ function viewStudentCerts(uid) {
 function renderCertCards(certsList) {
   return certsList.map(function(c) {
     var agency = (c.agency||'PSAI').toUpperCase();
+    var isInstrCert = (c.level||'').toLowerCase().indexOf('instructor')>=0 || (c.level||'').toLowerCase().indexOf('assistant')>=0;
+    var frontLogo = isInstrCert ? 'professional.jpg' : 'diver.jpg';
     return '<div>'+
       '<div class="cert-card"><div class="cert-front">'+
         '<div class="cert-front-level">'+(c.level||'Diver')+'</div>'+
-        '<div class="cert-front-logo-wrap"><img src="PSAI back.png" alt="PSAI" class="cert-front-logo"></div>'+
+        '<div class="cert-front-logo-wrap"><img src="'+frontLogo+'" alt="PSAI" class="cert-front-logo"></div>'+
         '<div class="cert-front-bottom">Professional Scuba Association International</div>'+
       '</div></div>'+
       '<div class="cert-card" style="margin-top:8px;"><div class="cert-back">'+
