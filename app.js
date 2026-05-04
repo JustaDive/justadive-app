@@ -605,19 +605,17 @@ function renderCertCards(certsList) {
       '<div class="cert-card" style="margin-top:8px;"><div class="cert-back">'+
         '<div class="cert-back-header">PSAI '+(c.level||'Certyfikat')+'</div>'+
         '<div class="cert-back-body">'+
-          '<div class="cert-back-left">'+
+          '<div class="cert-back-row">'+
             '<img src="JustaDive/PSAI logo bez tła.png" alt="PSAI" class="cert-back-logo">'+
-            '<div class="cert-back-detail">'+
-              (c.number?'Certification # '+c.number+'<br>':'')+
-              (c.date?fmtDate(c.date)+'<br>':'')+
-              (c.instructor?'Instructor: '+c.instructor+'<br>':'')+
-            '</div>'+
-            (c.notes?'<div class="cert-back-qual">'+c.notes+'</div>':'')+
-          '</div>'+
-          '<div class="cert-back-right">'+
             '<div class="cert-back-name">'+(c.name||'—')+'</div>'+
             (c.photo?'<img src="'+c.photo+'" class="cert-back-photo">':'')+
           '</div>'+
+          '<div class="cert-back-detail">'+
+            (c.number?'Certification # '+c.number+'<br>':'')+
+            (c.date?fmtDate(c.date)+'<br>':'')+
+            (c.instructor?'Instructor: '+c.instructor+'<br>':'')+
+          '</div>'+
+          (c.notes?'<div class="cert-back-qual">'+c.notes+'</div>':'')+
         '</div>'+
         '<div class="cert-back-footer">PSA INTERNATIONAL</div>'+
         '<div class="cert-back-iso">WWW.PSAI.PL</div>'+
