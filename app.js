@@ -190,8 +190,9 @@ async function loadUserProfile(user) {
     if (userRole === 'student' && d.instructorUid) {
       const instrSnap = await db.collection('users').doc(d.instructorUid).get();
       if (instrSnap.exists) {
-        currentSchoolName = instrSnap.data().schoolName || '';
-        currentSchoolLogo = instrSnap.data().schoolLogo || '';
+        var instrData = instrSnap.data();
+        currentSchoolName = instrData.schoolName || '';
+        currentSchoolLogo = instrData.schoolLogo || 'justadive';
       }
     }
     return true;
@@ -261,7 +262,7 @@ async function showApp(user) {
   } else if (currentSchoolLogo === 'dive-app') {
     brandLogo.src = 'austronaut_logo.jpg';
   } else {
-    brandLogo.src = 'JustaDive/PSAI logo bez tła.png';
+    brandLogo.src = 'JustaDive/logotyp negatyw.png';
   }
   const badge = document.getElementById('role-badge');
   if (userRole==='admin') {
