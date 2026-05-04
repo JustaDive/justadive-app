@@ -603,19 +603,22 @@ function renderCertCards(certsList) {
         '<div class="cert-front-bottom">Professional Scuba Association International</div>'+
       '</div></div>'+
       '<div class="cert-card" style="margin-top:8px;"><div class="cert-back">'+
-        '<div class="cert-back-header">'+agency+' '+(c.level||'Certyfikat')+'</div>'+
+        '<div class="cert-back-header">PSAI '+(c.level||'Certyfikat')+'</div>'+
         '<div class="cert-back-body">'+
           '<img src="JustaDive/PSAI logo bez tła.png" alt="PSAI" class="cert-back-logo">'+
-          '<div class="cert-back-info"><div class="cert-back-name">'+(c.name||'—')+'</div><div class="cert-back-detail">'+
-            (c.number?'Certification # <strong>'+c.number+'</strong><br>':'')+
-            (c.date?fmtDate(c.date)+'<br>':'')+
-            (c.instructor?'Instructor: <strong>'+c.instructor+'</strong><br>':'')+
-            (c.notes?'<em>'+c.notes+'</em>':'')+
-          '</div></div>'+
+          '<div class="cert-back-info">'+
+            '<div class="cert-back-name">'+(c.name||'—')+'</div>'+
+            '<div class="cert-back-detail">'+
+              (c.number?'Certification # '+c.number+'<br>':'')+
+              (c.date?fmtDate(c.date)+'<br>':'')+
+              (c.instructor?'Instructor: '+c.instructor+'<br>':'')+
+            '</div>'+
+            (c.notes?'<div class="cert-back-qual">'+c.notes+'</div>':'')+
+          '</div>'+
           (c.photo?'<img src="'+c.photo+'" class="cert-back-photo">':'')+
         '</div>'+
         '<div class="cert-back-footer">PSA INTERNATIONAL</div>'+
-        '<div class="cert-back-iso">ISO 49001 Certified / www.psai.pl</div>'+
+        '<div class="cert-back-iso">WWW.PSAI.PL</div>'+
       '</div></div>'+
       (userRole==='admin'?'<div class="cert-actions"><button class="btn-delete" onclick="deleteCert(\''+c.id+'\')">🗑 Usuń</button></div>':'')+
     '</div>';

@@ -242,8 +242,8 @@ details[open] .path-summary::before { content:'▼ '; }
   height:100%; display:flex; flex-direction:column; color:#1a1a1a;
 }
 .cert-back-header {
-  background: #1a2744; color:#fff; padding:5px 14px;
-  font-size:0.66rem; font-weight:800; text-align:center;
+  background: #1a2744; color:#fff; padding:6px 14px;
+  font-size:0.7rem; font-weight:800; text-align:center;
   letter-spacing:1.5px; text-transform:uppercase;
 }
 .cert-back-body {
@@ -256,24 +256,23 @@ details[open] .path-summary::before { content:'▼ '; }
   border:1px solid #ccc; flex-shrink:0;
 }
 .cert-back-name {
-  font-size:1.05rem; font-weight:900; color:#1a1a1a; line-height:1.15;
-  margin-bottom:4px;
+  font-size:1.1rem; font-weight:900; color:#1a1a1a; line-height:1.15;
+  margin-bottom:6px;
 }
-.cert-back-detail { font-size:0.62rem; color:#555; line-height:1.7; }
-.cert-back-detail strong { color:#1a1a1a; }
+.cert-back-detail { font-size:0.65rem; color:#333; line-height:1.8; }
 .cert-back-qual {
-  font-size:0.52rem; color:#666; padding:2px 14px 6px;
-  line-height:1.4; font-style:italic;
+  font-size:0.55rem; color:#555; margin-top:4px;
+  line-height:1.4;
 }
 .cert-back-footer {
-  background: linear-gradient(90deg, #1a2744, #2a3a5c);
-  color:#d4a843; padding:3px 14px;
-  font-size:0.58rem; font-weight:800; text-align:center;
+  background: #1a2744;
+  color:#d4a843; padding:4px 14px;
+  font-size:0.62rem; font-weight:800; text-align:center;
   letter-spacing:2.5px; text-transform:uppercase;
 }
 .cert-back-iso {
-  font-size:0.46rem; color:#888; text-align:center;
-  padding:2px 0; background:#d8dade; letter-spacing:0.5px;
+  font-size:0.52rem; color:var(--blue); text-align:center;
+  padding:3px 0; background:#1a2744; letter-spacing:1px; font-weight:700;
 }
 
 .cert-actions { text-align:right; margin-top:6px; }
