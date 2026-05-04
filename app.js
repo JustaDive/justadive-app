@@ -1008,7 +1008,7 @@ function resetQuiz() {
 
 async function showMyResults() {
   var c = document.getElementById('quiz-container');
-  var snap = await db.collection('quizResults').where('userId','==',currentUser.uid).orderBy('date','desc').limit(20).get();
+  var snap = await db.collection('quizResults').where('userId','==',currentUser.uid).limit(20).get();
   if (snap.empty) { c.innerHTML = '<div class="card-title">📊 <span class="accent">Moje wyniki</span></div><div class="empty-state"><h3>Brak wyników</h3><p>Rozwiąż egzamin żeby zobaczyć wyniki.</p></div><button class="btn-primary" onclick="resetQuiz()">🔄 Wróć</button>'; return; }
   var html = '<div class="card-title">📊 <span class="accent">Moje wyniki</span></div><div style="max-height:60vh;overflow-y:auto;">';
   snap.forEach(function(doc){
