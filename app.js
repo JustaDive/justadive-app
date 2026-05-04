@@ -559,13 +559,30 @@ function renderCerts() {
   if (!certsViewStudent) {
     // Pokaż listę kursantów
     if (!students.length) {
-      grid.innerHTML = '<div class="empty-state"><span class="empty-icon">🎓</span><h3>Brak kursantów</h3><p>Dodaj kursanta w zakładce Zarządzanie/Kursanci.</p></div>';
+      grid.innerHTML = '<div class="empty-state"><span class="empty-icon">🎓</span><h3>Brak kursantów</h3><p>Dodaj kursanta w zakładce Kursanci.</p></div>';
       return;
     }
-    grid.innerHTML = students.map(function(s) {
+    // Sortuj alfabetycznie
+    var sorted = students.slice().sort(function(a,b){
+      var na = ((a.firstName||'')+' '+(a.lastName||'')).trim() || a.name || a.email;
+      var nb = ((b.firstName||'')+' '+(b.lastName||'')).trim() || b.name || b.email;
+      return na.localeCompare(nb);
+    });
+    // Filtruj po wyszukiwaniu
+    var searchVal = (document.getElementById('cert-search')||{}).value || '';
+    if (searchVal) {
+      var q = searchVal.toLowerCase();
+      sorted = sorted.filter(function(s){
+        var name = ((s.firstName||'')+' '+(s.lastName||'')+' '+s.email+' '+(s.name||'')).toLowerCase();
+        return name.indexOf(q) >= 0;
+      });
+    }
+    var html = '<div style="margin-bottom:10px;"><input type="text" id="cert-search" class="search-input" placeholder="Szukaj kursanta..." oninput="renderCerts()" value="'+searchVal+'"></div>';
+    html += sorted.map(function(s) {
       var name = ((s.firstName||'')+ ' '+(s.lastName||'')).trim() || s.name || s.email;
       return '<div class="student-card" onclick="viewStudentCerts(\''+s.uid+'\')"><div class="student-info"><div class="student-name">'+name+'</div><div class="student-email">'+s.email+'</div></div><div style="color:var(--blue);font-size:0.8rem;">→</div></div>';
     }).join('');
+    grid.innerHTML = html;
     return;
   }
 
@@ -591,13 +608,8 @@ function viewStudentCerts(uid) {
 function renderCertCards(certsList) {
   return certsList.map(function(c) {
     var agency = (c.agency||'PSAI').toUpperCase();
-    var isInstrCert = (c.level||'').toLowerCase().indexOf('instructor')>=0 || (c.level||'').toLowerCase().indexOf('assistant')>=0;
-    var frontLogo = isInstrCert ? 'professional.jpg' : 'diver.jpg';
     return '<div>'+
-      '<div class="cert-card"><div class="cert-front">'+
-        '<div class="cert-front-logo-wrap"><img src="'+frontLogo+'" alt="PSAI" class="cert-front-logo"></div>'+
-      '</div></div>'+
-      '<div class="cert-card" style="margin-top:8px;"><div class="cert-back">'+
+      '<div class="cert-card"><div class="cert-back">'+
         '<div class="cert-back-header">PSAI '+(c.level||'Certyfikat')+'</div>'+
         '<div class="cert-back-body">'+
           '<div class="cert-back-row">'+

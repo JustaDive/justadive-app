@@ -210,7 +210,7 @@ details[open] .path-summary::before { content:'▼ '; }
 .path-image { width:100%; border-radius:10px; margin-top:8px; }
 
 /* ── Certifications — PSAI-style card ── */
-.certs-grid { display:grid; grid-template-columns:1fr; gap:20px; max-width:440px; }
+.certs-grid { display:grid; grid-template-columns:1fr 1fr; gap:12px; max-width:900px; }
 .cert-card {
   border-radius:14px; overflow:hidden; position:relative;
   box-shadow:0 8px 32px rgba(0,0,0,0.5);
@@ -478,6 +478,7 @@ details[open] .path-summary::before { content:'▼ '; }
   .container { padding:14px 12px 60px; }
   input, select, textarea { font-size:16px; max-width:100%; }
   .cert-details { grid-template-columns:1fr; }
+  .certs-grid { grid-template-columns:1fr; }
   #quiz-categories { grid-template-columns:1fr; }
   .cert-form-grid { grid-template-columns:1fr; }
   .tabs-bar { width:100%; }
