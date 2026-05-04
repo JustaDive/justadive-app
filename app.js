@@ -993,8 +993,11 @@ async function showQuizResults() {
   snap.forEach(function(doc){
     var r = doc.data();
     var color = r.percent>=80?'#22c55e':r.percent>=50?'#f59e0b':'var(--danger)';
-    html += '<div class="student-card" style="cursor:default;margin-bottom:6px;"><div class="student-info"><div class="student-name">'+r.userName+'</div><div class="student-email">'+r.categoryName+' · '+(r.date||'').substring(0,10)+'</div>';
-    if (r.errors&&r.errors.length) html += '<div style="font-size:0.6rem;color:var(--danger);margin-top:2px;">Błędy: '+r.errors.map(function(e){return e.q.substring(0,40)+'...';}).join(', ')+'</div>';
+    var subject = encodeURIComponent('Wynik egzaminu: ' + r.categoryName + ' - ' + r.percent + '%');
+    var body = encodeURIComponent('Cześć ' + (r.userName||'') + ',\n\nTwój wynik egzaminu:\nKategoria: ' + r.categoryName + '\nWynik: ' + r.score + '/' + r.total + ' (' + r.percent + '%)\nData: ' + (r.date||'').substring(0,10) + (r.errors&&r.errors.length ? '\n\nBłędy:\n' + r.errors.map(function(e){return '- ' + e.q + '\n  Twoja: ' + e.given + '\n  Poprawna: ' + e.correct;}).join('\n') : '') + '\n\nPozdrawiam');
+    var mailto = 'mailto:' + (r.userEmail||'') + '?subject=' + subject + '&body=' + body;
+    html += '<div class="student-card" style="cursor:pointer;margin-bottom:6px;" onclick="window.open(\''+mailto+'\')"><div class="student-info"><div class="student-name">'+r.userName+'</div><div class="student-email">'+r.categoryName+' · '+(r.date||'').substring(0,10)+' · ✉️ kliknij aby wysłać email</div>';
+    if (r.errors&&r.errors.length) html += '<div style="font-size:0.6rem;color:var(--danger);margin-top:2px;">'+r.errors.length+' błędów</div>';
     html += '</div><div style="font-size:1.1rem;font-weight:800;color:'+color+';">'+r.percent+'%</div></div>';
   });
   html += '</div><button class="btn-primary" onclick="resetQuiz()" style="margin-top:12px;">🔄 Wróć</button>';
