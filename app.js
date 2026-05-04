@@ -255,14 +255,16 @@ async function showApp(user) {
 
   // Logo szkoły w headerze
   const brandLogo = document.getElementById('brand-logo');
-  if (currentSchoolLogo && currentSchoolLogo.startsWith('data:')) {
+  if (userRole === 'admin') {
+    brandLogo.src = 'JustaDive/PSAI logo bez tła.png';
+  } else if (currentSchoolLogo && currentSchoolLogo.startsWith('data:')) {
     brandLogo.src = currentSchoolLogo;
   } else if (currentSchoolLogo === 'justadive') {
     brandLogo.src = 'JustaDive/logotyp negatyw.png';
   } else if (currentSchoolLogo === 'dive-app') {
     brandLogo.src = 'austronaut_logo.jpg';
   } else {
-    brandLogo.src = 'JustaDive/logotyp negatyw.png';
+    brandLogo.src = 'JustaDive/PSAI logo bez tła.png';
   }
   const badge = document.getElementById('role-badge');
   if (userRole==='admin') {
