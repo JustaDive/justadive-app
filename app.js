@@ -201,6 +201,11 @@ async function chooseRole(role) {
   document.getElementById('role-modal').classList.remove('open');
   var user = pendingNewUser;
   pendingNewUser = null;
+  // Wyślij email weryfikacyjny
+  if (user.emailVerified === false) {
+    user.sendEmailVerification().catch(function(){});
+    showToast('📧 Email weryfikacyjny wysłany na ' + user.email);
+  }
   userRole = role;
   myEnabledQuizzes = [];
   currentSchoolName = '';
