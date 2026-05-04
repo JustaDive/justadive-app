@@ -305,10 +305,23 @@ async function showApp(user) {
     if (document.getElementById('panel-log').classList.contains('active')) renderDives();
   });
   if (unsubCerts) unsubCerts();
-  unsubCerts = certsCol.orderBy('date','desc').onSnapshot(snap => {
-    certs = snap.docs.map(doc=>({id:doc.id,...doc.data()}));
-    if (document.getElementById('panel-certs').classList.contains('active')) renderCerts();
-  });
+  if (userRole === 'admin' || userRole === 'instructor') {
+    // Admin/Instruktor: ładuj certyfikaty swoich kursantów + własne
+    certsCol.orderBy('date','desc').get().then(async function(snap) {
+      certs = snap.docs.map(doc=>({id:doc.id,...doc.data()}));
+      var userList = userRole === 'admin' ? students : students;
+      for (var s of userList) {
+        var sSnap = await db.collection('users').doc(s.uid).collection('certs').get();
+        sSnap.forEach(function(doc) { certs.push({id:doc.id, studentUid:s.uid, ...doc.data()}); });
+      }
+      if (document.getElementById('panel-certs').classList.contains('active')) renderCerts();
+    });
+  } else {
+    unsubCerts = certsCol.orderBy('date','desc').onSnapshot(snap => {
+      certs = snap.docs.map(doc=>({id:doc.id,...doc.data()}));
+      if (document.getElementById('panel-certs').classList.contains('active')) renderCerts();
+    });
+  }
   await loadQuizData();
   renderQuizCategories();
   listenLibrary();
@@ -651,7 +664,15 @@ async function saveCert() {
 }
 async function deleteCert(id) {
   if(!confirm('Usunąć ten certyfikat?'))return;
-  await certsCol.doc(id).delete();
+  // Admin: szukaj w certs array po ref
+  var cert = certs.find(function(c){ return c.id === id; });
+  if (cert && cert.ref) {
+    await cert.ref.delete();
+  } else if (cert && cert.studentUid) {
+    await db.collection('users').doc(cert.studentUid).collection('certs').doc(id).delete();
+  } else {
+    await certsCol.doc(id).delete();
+  }
   showToast('🗑 Certyfikat usunięty');
 }
 
