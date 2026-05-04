@@ -796,20 +796,18 @@ function renderQuizCategories() {
   var isPriv = userRole==='admin'||userRole==='instructor';
   var isAdmin = userRole==='admin';
   var html = '';
-  // Przyciski funkcyjne na górze — toolbar
+  // Przyciski funkcyjne — kafelki jak testy
   if (isAdmin || isPriv || userRole === 'student') {
-    html += '<div class="quiz-toolbar">';
     if (isAdmin) {
-      html += '<button class="quiz-toolbar-btn" onclick="openUploadQuiz()"><span>📂</span> Załaduj</button>';
-      html += '<button class="quiz-toolbar-btn" onclick="downloadQuizTxt()"><span>📥</span> Pobierz</button>';
+      html += '<div class="quiz-cat" onclick="openUploadQuiz()" style="cursor:pointer;"><div class="quiz-cat-name">Załaduj pytania</div></div>';
+      html += '<div class="quiz-cat" onclick="downloadQuizTxt()" style="cursor:pointer;"><div class="quiz-cat-name">Pobierz pytania</div></div>';
     }
     if (isPriv) {
-      html += '<button class="quiz-toolbar-btn" onclick="showQuizResults()"><span>📊</span> Wyniki</button>';
+      html += '<div class="quiz-cat" onclick="showQuizResults()" style="cursor:pointer;"><div class="quiz-cat-name">Wyniki kursantów</div></div>';
     }
     if (userRole === 'student') {
-      html += '<button class="quiz-toolbar-btn" onclick="showMyResults()"><span>📊</span> Moje wyniki</button>';
+      html += '<div class="quiz-cat" onclick="showMyResults()" style="cursor:pointer;"><div class="quiz-cat-name">Moje wyniki</div></div>';
     }
-    html += '</div>';
   }
   // Lista egzaminów — bez ikon
   html += Object.entries(quizData).map(function(entry){
