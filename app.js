@@ -1033,7 +1033,7 @@ async function showQuizResults() {
   var results = [];
   snap.forEach(function(doc){ results.push({id:doc.id, ...doc.data()}); });
   window._quizResults = results;
-  var html = '<div class="card-title">📊 <span class="accent">Wyniki kursantów</span></div><div style="max-height:60vh;overflow-y:auto;">';
+  var html = '<div class="card-title">📊 <span class="accent">Wyniki kursantów</span></div><button class="library-btn" onclick="resetQuiz()" style="margin-bottom:12px;">← Egzaminy</button><div style="max-height:60vh;overflow-y:auto;">';
   results.forEach(function(r, idx){
     var color = r.percent>=80?'#22c55e':r.percent>=50?'#f59e0b':'var(--danger)';
     html += '<div class="student-card" style="cursor:pointer;margin-bottom:6px;" onclick="showResultDetail('+idx+')"><div class="student-info"><div class="student-name">'+(r.userName||r.userEmail||'')+'</div><div class="student-email">'+r.categoryName+' · '+(r.date||'').substring(0,10)+'</div>';
