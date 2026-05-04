@@ -1025,6 +1025,10 @@ async function showMyResults() {
 async function showQuizResults() {
   var c = document.getElementById('quiz-container');
   var snap = await db.collection('quizResults').orderBy('date','desc').limit(50).get();
+  if (snap.empty) {
+    // Spróbuj bez orderBy (może brak indexu)
+    snap = await db.collection('quizResults').limit(50).get();
+  }
   if (snap.empty) { c.innerHTML = '<div class="card-title">📊 <span class="accent">Wyniki</span></div><div class="empty-state"><h3>Brak wyników</h3></div><button class="btn-primary" onclick="resetQuiz()">🔄 Wróć</button>'; return; }
   var results = [];
   snap.forEach(function(doc){ results.push(doc.data()); });
