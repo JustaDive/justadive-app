@@ -667,8 +667,7 @@ function fillCertStudent() {
   if (opt) {
     var fname = opt.dataset.fname || '';
     var lname = opt.dataset.lname || '';
-    // Jeśli brak firstName/lastName, spróbuj rozdzielić name
-    if (!fname && !lname && opt.dataset.name) {
+    if (!fname && !lname && opt.dataset.name && !opt.dataset.name.includes('@')) {
       var parts = opt.dataset.name.split(' ');
       fname = parts[0] || '';
       lname = parts.slice(1).join(' ') || '';
