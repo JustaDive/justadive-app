@@ -340,7 +340,7 @@ function hideApp() {
 function switchTab(tab) {
   const names = {
     'Certyfikaty':'certs','Egzaminy':'quiz','Biblioteka':'library',
-    'Logbook':'log','Sklep':'shop','Kursanci':'manage','Zarządzanie':'manage'
+    'Logbook':'log','Sklep':'shop','Kursanci':'manage'
   };
   document.querySelectorAll('.tab').forEach(t => {
     const n = names[t.textContent.trim()]; t.classList.toggle('active', n===tab);
