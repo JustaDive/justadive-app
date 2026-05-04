@@ -99,7 +99,7 @@ body {
   flex-wrap: wrap; gap: 12px;
 }
 .brand { display: flex; align-items: center; gap: 12px; }
-.brand-logo { height:64px; }
+.brand-logo { height:78px; }
 .brand-text { display: flex; flex-direction: column; }
 .brand-name {
   font-family: 'TwCenMT', 'Inter', sans-serif;
