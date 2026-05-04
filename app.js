@@ -275,7 +275,7 @@ async function showApp(user) {
     document.getElementById('btn-add-cert').style.display='';
     document.getElementById('btn-add-pdf').style.display='';
     document.getElementById('admin-role-section').style.display='';
-    loadAllUsers().then(function(){ loadCertsForView(); });
+    loadAllUsers();
   } else if (userRole==='instructor') {
     badge.textContent='🏅 Instruktor'; badge.className='role-badge instructor';
     document.getElementById('tabs-student').style.display='none';
@@ -284,8 +284,7 @@ async function showApp(user) {
     document.getElementById('btn-add-cert').style.display='none';
     document.getElementById('btn-add-pdf').style.display='none';
     document.getElementById('admin-role-section').style.display='none';
-    loadStudents().then(function(){ loadCertsForView(); });
-  } else {
+    loadStudents();  } else {
     badge.textContent='🎓 Kursant'; badge.className='role-badge student';
     document.getElementById('tabs-student').style.display='flex';
     document.getElementById('tabs-instructor').style.display='none';
@@ -305,7 +304,8 @@ async function showApp(user) {
   });
   if (unsubCerts) unsubCerts();
   if (userRole === 'admin' || userRole === 'instructor') {
-    // Certyfikaty ładowane w loadCertsForAdmin po załadowaniu studentów
+    // Certyfikaty ładowane po załadowaniu studentów
+    setTimeout(function(){ loadCertsForView().then(function(){ renderCerts(); }); }, 500);
   } else {
     unsubCerts = certsCol.orderBy('date','desc').onSnapshot(snap => {
       certs = snap.docs.map(doc=>({id:doc.id,...doc.data()}));
