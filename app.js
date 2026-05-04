@@ -1031,12 +1031,12 @@ async function showQuizResults() {
   }
   if (snap.empty) { c.innerHTML = '<div class="card-title">📊 <span class="accent">Wyniki</span></div><div class="empty-state"><h3>Brak wyników</h3></div><button class="btn-primary" onclick="resetQuiz()">🔄 Wróć</button>'; return; }
   var results = [];
-  snap.forEach(function(doc){ results.push(doc.data()); });
+  snap.forEach(function(doc){ results.push({id:doc.id, ...doc.data()}); });
   window._quizResults = results;
   var html = '<div class="card-title">📊 <span class="accent">Wyniki kursantów</span></div><div style="max-height:60vh;overflow-y:auto;">';
   results.forEach(function(r, idx){
     var color = r.percent>=80?'#22c55e':r.percent>=50?'#f59e0b':'var(--danger)';
-    html += '<div class="student-card" style="cursor:pointer;margin-bottom:6px;" onclick="showResultDetail('+idx+')"><div class="student-info"><div class="student-name">'+r.userName+'</div><div class="student-email">'+r.categoryName+' · '+(r.date||'').substring(0,10)+'</div>';
+    html += '<div class="student-card" style="cursor:pointer;margin-bottom:6px;" onclick="showResultDetail('+idx+')"><div class="student-info"><div class="student-name">'+(r.userName||r.userEmail||'')+'</div><div class="student-email">'+r.categoryName+' · '+(r.date||'').substring(0,10)+'</div>';
     if (r.errors&&r.errors.length) html += '<div style="font-size:0.6rem;color:var(--danger);margin-top:2px;">'+r.errors.length+' błędów</div>';
     html += '</div><div style="font-size:1.1rem;font-weight:800;color:'+color+';">'+r.percent+'%</div></div>';
   });
@@ -1050,8 +1050,9 @@ function showResultDetail(idx) {
   var c = document.getElementById('quiz-container');
   var color = r.percent>=80?'#22c55e':r.percent>=50?'#f59e0b':'var(--danger)';
   var html = '<div style="margin-bottom:12px;"><button class="library-btn" onclick="showQuizResults()">← Wróć do listy</button></div>';
-  html += '<div style="text-align:center;margin-bottom:16px;"><div style="font-size:0.72rem;color:var(--text-dim);">'+r.categoryName+' · '+(r.date||'').substring(0,10)+'</div>';
-  html += '<div style="font-size:1.4rem;font-weight:900;">'+r.userName+'</div>';
+  html += '<div style="text-align:center;margin-bottom:16px;">';
+  html += '<div style="font-size:0.72rem;color:var(--text-dim);">'+r.categoryName+' · '+(r.date||'').substring(0,10)+'</div>';
+  html += '<div style="font-size:1.4rem;font-weight:900;">'+(r.userName||r.userEmail||'')+'</div>';
   html += '<div style="font-size:2rem;font-weight:900;color:'+color+';margin-top:4px;">'+r.percent+'%</div>';
   html += '<div style="font-size:0.78rem;color:var(--text-dim);">'+r.score+'/'+r.total+' poprawnych</div></div>';
   if (r.errors && r.errors.length) {
@@ -1064,12 +1065,11 @@ function showResultDetail(idx) {
       html += '</div>';
     });
   } else {
-    html += '<div style="text-align:center;color:#22c55e;font-weight:700;">Brak błędów — wszystko poprawnie!</div>';
+    html += '<div style="text-align:center;color:#22c55e;font-weight:700;">Brak błędów!</div>';
   }
-  // Przycisk email
   var subject = encodeURIComponent('Wynik egzaminu: ' + r.categoryName + ' - ' + r.percent + '%');
-  var body = encodeURIComponent('Cześć ' + (r.userName||'') + ',\n\nTwój wynik egzaminu:\nKategoria: ' + r.categoryName + '\nWynik: ' + r.score + '/' + r.total + ' (' + r.percent + '%)\nData: ' + (r.date||'').substring(0,10) + (r.errors&&r.errors.length ? '\n\nBłędy:\n' + r.errors.map(function(e){return '- ' + e.q + '\n  Twoja: ' + e.given + '\n  Poprawna: ' + e.correct;}).join('\n') : '') + '\n\nPozdrawiam');
-  var mailto = 'mailto:' + (r.userEmail||'') + '?subject=' + subject + '&body=' + body;
+  var body = encodeURIComponent('Czesc ' + (r.userName||'') + ',\n\nTwoj wynik egzaminu:\nKategoria: ' + r.categoryName + '\nWynik: ' + r.score + '/' + r.total + ' (' + r.percent + '%)\nData: ' + (r.date||'').substring(0,10) + (r.errors&&r.errors.length ? '\n\nBledy:\n' + r.errors.map(function(e){return '- ' + e.q + '\n  Twoja: ' + e.given + '\n  Poprawna: ' + e.correct;}).join('\n') : '') + '\n\nPozdrawiam');
+  var mailto = 'mailto:' + encodeURIComponent(r.userEmail||'') + '?subject=' + subject + '&body=' + body;
   html += '<a href="'+mailto+'" class="btn-primary" style="display:block;text-align:center;margin-top:16px;text-decoration:none;">✉️ Wyślij wynik emailem</a>';
   c.innerHTML = html;
 }
