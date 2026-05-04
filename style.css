@@ -211,9 +211,10 @@ details[open] .path-summary::before { content:'▼ '; }
 
 /* ── Certifications — PSAI-style card ── */
 .certs-grid { display:grid; grid-template-columns:1fr; gap:12px; }
-.certs-cards-grid { display:grid; grid-template-columns:1fr 1fr; gap:12px; }
-.certs-cards-grid .cert-card { min-height:220px; }
-@media(max-width:600px) { .certs-cards-grid { grid-template-columns:1fr; } .certs-cards-grid .cert-card { min-height:auto; } }
+.certs-cards-grid { display:grid; grid-template-columns:1fr 1fr; gap:12px; align-items:stretch; }
+.certs-cards-grid > div { display:flex; flex-direction:column; }
+.certs-cards-grid .cert-card { flex:1; }
+@media(max-width:600px) { .certs-cards-grid { grid-template-columns:1fr; } }
 .cert-card {
   border-radius:14px; overflow:hidden; position:relative;
   box-shadow:0 8px 32px rgba(0,0,0,0.5);
