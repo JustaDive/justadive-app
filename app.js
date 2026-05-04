@@ -621,8 +621,8 @@ function renderCertCards(certsList) {
           '</div>'+
           (c.notes?'<div class="cert-back-qual">'+c.notes+'</div>':'')+
         '</div>'+
-        '<div class="cert-back-footer">PSA INTERNATIONAL</div>'+
-        '<div class="cert-back-iso">WWW.PSAI.PL</div>'+
+        '<div class="cert-back-footer">PSA International</div>'+
+        '<div class="cert-back-iso">ISO #9001 certified / www.psai.pl</div>'+
       '</div></div>'+
       (userRole==='admin'?'<div class="cert-actions"><button class="btn-delete" onclick="deleteCert(\''+c.id+'\')">🗑 Usuń</button></div>':'')+
     '</div>';
