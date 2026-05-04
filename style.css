@@ -197,6 +197,18 @@ select option { background: #fff; color: #1a1a1a; }
 }
 .btn-primary:hover { transform:translateY(-1px); box-shadow:0 6px 28px rgba(41,171,226,0.3); }
 
+/* ── Path details ── */
+.path-details { margin-bottom:12px; }
+.path-summary {
+  cursor:pointer; font-size:0.76rem; font-weight:700; color:var(--blue);
+  padding:10px 14px; background:var(--bg-card); border:1px solid var(--border);
+  border-radius:10px; list-style:none;
+}
+.path-summary::-webkit-details-marker { display:none; }
+.path-summary::before { content:'▶ '; font-size:0.6rem; }
+details[open] .path-summary::before { content:'▼ '; }
+.path-image { width:100%; border-radius:10px; margin-top:8px; }
+
 /* ── Certifications — PSAI-style card ── */
 .certs-grid { display:grid; grid-template-columns:1fr; gap:20px; max-width:440px; }
 .cert-card {
