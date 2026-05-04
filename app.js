@@ -602,9 +602,7 @@ function renderCertCards(certsList) {
     var frontLogo = isInstrCert ? 'professional.jpg' : 'diver.jpg';
     return '<div>'+
       '<div class="cert-card"><div class="cert-front">'+
-        '<div class="cert-front-level">'+(c.level||'Diver')+'</div>'+
         '<div class="cert-front-logo-wrap"><img src="'+frontLogo+'" alt="PSAI" class="cert-front-logo"></div>'+
-        '<div class="cert-front-bottom">Professional Scuba Association International</div>'+
       '</div></div>'+
       '<div class="cert-card" style="margin-top:8px;"><div class="cert-back">'+
         '<div class="cert-back-header">PSAI '+(c.level||'Certyfikat')+'</div>'+
