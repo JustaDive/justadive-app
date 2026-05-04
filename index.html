@@ -176,19 +176,10 @@
   <!-- Sklep -->
   <div class="panel" id="panel-shop">
     <div class="card">
-      <div class="card-title">🛒 Sklep <span class="accent">nurkowy</span></div>
+      <div class="card-title">Sklep <span class="accent">nurkowy</span></div>
       <p style="font-size:0.76rem;color:var(--text-dim);margin-bottom:4px;">Sprzęt nurkowy, kursy, akcesoria — wszystko w jednym miejscu.</p>
     </div>
-    <div class="shop-categories">
-      <a href="https://justadive.pl/home/sklep/" target="_blank" class="shop-cat"><span class="shop-cat-icon">🤿</span><div class="shop-cat-name">Maski & Rurki</div></a>
-      <a href="https://justadive.pl/home/sklep/" target="_blank" class="shop-cat"><span class="shop-cat-icon">🦺</span><div class="shop-cat-name">Jacket BCD</div></a>
-      <a href="https://justadive.pl/home/sklep/" target="_blank" class="shop-cat"><span class="shop-cat-icon">⚙️</span><div class="shop-cat-name">Regulatory</div></a>
-      <a href="https://justadive.pl/home/sklep/" target="_blank" class="shop-cat"><span class="shop-cat-icon">🧤</span><div class="shop-cat-name">Pianki</div></a>
-      <a href="https://justadive.pl/home/sklep/" target="_blank" class="shop-cat"><span class="shop-cat-icon">🦶</span><div class="shop-cat-name">Płetwy</div></a>
-      <a href="https://justadive.pl/home/sklep/" target="_blank" class="shop-cat"><span class="shop-cat-icon">🎒</span><div class="shop-cat-name">Akcesoria</div></a>
-    </div>
-    <a href="https://justadive.pl/home/sklep/" target="_blank" class="shop-go">🛒 GO TO SHOP JUSTADIVE.PL</a>
-    <div class="shop-contact">📞 +48 666 663 224 · 🌐 www.justadive.pl</div>
+    <div id="shop-content"></div>
   </div>
 
   <!-- Panel zarządzania (instruktor: kursanci, admin: wszyscy) -->
@@ -376,6 +367,10 @@
           <img id="pf-school-logo" style="width:48px;height:48px;object-fit:contain;border-radius:8px;border:1px solid var(--border);background:var(--bg-input);">
           <label class="import-label" style="margin:0;">📷 Zmień logo<input type="file" accept="image/*" onchange="uploadSchoolLogo(event)" style="display:none;"></label>
         </div>
+      </div>
+      <div class="form-group full" id="pf-shop-section" style="display:none;">
+        <label>Link do sklepu (URL)</label>
+        <input type="url" id="pf-shop-url" placeholder="https://justadive.pl/home/sklep/" style="margin-top:4px;">
       </div>
       <div class="form-group full"><button class="btn-delete" onclick="changePassword()" style="width:100%;text-align:center;">🔑 Zmień hasło</button></div>
     </div>

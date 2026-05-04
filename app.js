@@ -315,6 +315,7 @@ async function showApp(user) {
   await loadQuizData();
   renderQuizCategories();
   listenLibrary();
+  await loadShopUrl();
   switchTab('certs');
   if (currentLang !== 'pl') switchLang(currentLang);
 }
@@ -344,6 +345,7 @@ function switchTab(tab) {
   if (tab==='certs') renderCerts();
   if (tab==='manage') renderStudents();
   if (tab==='library') renderLibrary();
+  if (tab==='shop') renderShop();
 }
 
 // ─── Stats ───
@@ -1115,6 +1117,32 @@ async function renameLibItem(id) {
   showToast('✅ Nazwa zmieniona');
 }
 
+// ─── Sklep ───
+let currentShopUrl = 'https://justadive.pl/home/sklep/';
+
+async function loadShopUrl() {
+  // Kursant: pobierz URL sklepu od instruktora
+  if (userRole === 'student') {
+    var snap = await userDocRef.get();
+    var d = snap.data() || {};
+    if (d.instructorUid) {
+      var instrSnap = await db.collection('users').doc(d.instructorUid).get();
+      if (instrSnap.exists) {
+        currentShopUrl = instrSnap.data().shopUrl || 'https://justadive.pl/home/sklep/';
+      }
+    }
+  } else {
+    var snap = await userDocRef.get();
+    currentShopUrl = (snap.data()||{}).shopUrl || 'https://justadive.pl/home/sklep/';
+  }
+}
+
+function renderShop() {
+  var el = document.getElementById('shop-content');
+  el.innerHTML = '<div style="margin-top:12px;"><a href="'+currentShopUrl+'" target="_blank" class="shop-go">Przejdź do sklepu</a></div>' +
+    '<div class="shop-contact" style="margin-top:12px;">'+currentShopUrl+'</div>';
+}
+
 // ─── Profil ───
 let currentLang = 'pl';
 
@@ -1142,11 +1170,15 @@ async function openProfile() {
   document.getElementById('pf-avatar').src = d.avatar || document.getElementById('user-avatar').src;
   // Logo szkoły — tylko instruktor/admin
   var logoSection = document.getElementById('pf-logo-section');
+  var shopSection = document.getElementById('pf-shop-section');
   if (userRole === 'instructor' || userRole === 'admin') {
     logoSection.style.display = '';
+    shopSection.style.display = '';
     document.getElementById('pf-school-logo').src = d.schoolLogo || 'JustaDive/PSAI logo bez tła.png';
+    document.getElementById('pf-shop-url').value = d.shopUrl || 'https://justadive.pl/home/sklep/';
   } else {
     logoSection.style.display = 'none';
+    shopSection.style.display = 'none';
   }
   document.getElementById('profile-modal').classList.add('open');
   } catch(err) { showToast('⚠️ Błąd: ' + err.message); }
@@ -1161,6 +1193,7 @@ async function saveProfile() {
     name: document.getElementById('pf-fname').value.trim() + ' ' + document.getElementById('pf-lname').value.trim(),
     phone: document.getElementById('pf-phone').value.trim(),
     certNumber: document.getElementById('pf-instnum') ? document.getElementById('pf-instnum').value.trim() : '',
+    shopUrl: document.getElementById('pf-shop-url') ? document.getElementById('pf-shop-url').value.trim() : '',
     street: document.getElementById('pf-street').value.trim(),
     city: document.getElementById('pf-city').value.trim(),
     country: document.getElementById('pf-country').value.trim(),
