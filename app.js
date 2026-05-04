@@ -602,13 +602,13 @@ function renderCertCards(certsList) {
     return '<div>'+
       '<div class="cert-card"><div class="cert-front">'+
         '<div class="cert-front-level">'+(c.level||'Diver')+'</div>'+
-        '<div class="cert-front-logo-wrap"><img src="JustaDive/PSAI logo bez tła.png" alt="PSAI" class="cert-front-logo"></div>'+
+        '<div class="cert-front-logo-wrap"><img src="PSAI back.png" alt="PSAI" class="cert-front-logo"></div>'+
         '<div class="cert-front-bottom">Professional Scuba Association International</div>'+
       '</div></div>'+
       '<div class="cert-card" style="margin-top:8px;"><div class="cert-back">'+
         '<div class="cert-back-header">'+agency+' '+(c.level||'Certyfikat')+'</div>'+
         '<div class="cert-back-body">'+
-          '<img src="PSAI back.png" alt="PSAI" class="cert-back-logo">'+
+          '<img src="JustaDive/PSAI logo bez tła.png" alt="PSAI" class="cert-back-logo">'+
           '<div class="cert-back-info"><div class="cert-back-name">'+(c.name||'—')+'</div><div class="cert-back-detail">'+
             (c.number?'Certification # <strong>'+c.number+'</strong><br>':'')+
             (c.date?fmtDate(c.date)+'<br>':'')+
