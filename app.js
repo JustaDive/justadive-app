@@ -539,7 +539,8 @@ function closeModal(e){if(e.target===document.getElementById('modal'))closeModal
 function closeModalDirect(){document.getElementById('modal').classList.remove('open');}
 
 // ─── Certifications ───
-let certsViewStudent = null; // null = lista kursantów, uid = certyfikaty tego kursanta
+let certsViewStudent = null;
+let certSortAsc = true;
 
 function renderCerts() {
   const grid = document.getElementById('certs-grid');
@@ -551,7 +552,7 @@ function renderCerts() {
       grid.innerHTML = '<div class="empty-state"><span class="empty-icon">🎓</span><h3>Brak certyfikatów</h3><p>Twój instruktor doda Ci certyfikat.</p></div>';
       return;
     }
-    grid.innerHTML = renderCertCards(certs);
+    grid.innerHTML = '<div class="certs-cards-grid">' + renderCertCards(certs) + '</div>';
     return;
   }
 
@@ -566,7 +567,7 @@ function renderCerts() {
     var sorted = students.slice().sort(function(a,b){
       var na = ((a.firstName||'')+' '+(a.lastName||'')).trim() || a.name || a.email;
       var nb = ((b.firstName||'')+' '+(b.lastName||'')).trim() || b.name || b.email;
-      return na.localeCompare(nb);
+      return certSortAsc ? na.localeCompare(nb) : nb.localeCompare(na);
     });
     // Filtruj po wyszukiwaniu
     var searchVal = (document.getElementById('cert-search')||{}).value || '';
@@ -577,7 +578,7 @@ function renderCerts() {
         return name.indexOf(q) >= 0;
       });
     }
-    var html = '<div style="margin-bottom:10px;"><input type="text" id="cert-search" class="search-input" placeholder="Szukaj kursanta..." oninput="renderCerts()" value="'+searchVal+'"></div>';
+    var html = '<div style="display:flex;gap:8px;margin-bottom:10px;align-items:center;"><input type="text" id="cert-search" class="search-input" placeholder="Szukaj kursanta..." oninput="renderCerts()" value="'+searchVal+'" style="flex:1;"><button class="library-btn" onclick="certSortAsc=!certSortAsc;renderCerts();">A-Z ↕</button></div>';
     html += sorted.map(function(s) {
       var name = ((s.firstName||'')+ ' '+(s.lastName||'')).trim() || s.name || s.email;
       return '<div class="student-card" onclick="viewStudentCerts(\''+s.uid+'\')"><div class="student-info"><div class="student-name">'+name+'</div><div class="student-email">'+s.email+'</div></div><div style="color:var(--blue);font-size:0.8rem;">→</div></div>';
@@ -595,7 +596,7 @@ function renderCerts() {
   if (!studentCerts.length) {
     html += '<div class="empty-state"><h3>Brak certyfikatów</h3></div>';
   } else {
-    html += renderCertCards(studentCerts);
+    html += '<div class="certs-cards-grid">' + renderCertCards(studentCerts) + '</div>';
   }
   grid.innerHTML = html;
 }
