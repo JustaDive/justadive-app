@@ -615,7 +615,7 @@ function renderCertCards(certsList) {
         '<div class="cert-back-footer">PSA International</div>'+
         '<div class="cert-back-iso">ISO #9001 certified / www.psai.pl</div>'+
       '</div></div>'+
-      (userRole==='admin'?'<div class="cert-actions"><button class="btn-delete" onclick="deleteCert(\''+c.id+'\')">🗑 Usuń</button></div>':'')+
+      (userRole==='admin'?'<div class="cert-actions"><button class="library-btn" onclick="editCert(\''+c.id+'\',\''+( c.studentUid||'')+'\')">✏️ Edytuj</button> <button class="btn-delete" onclick="deleteCert(\''+c.id+'\')">🗑 Usuń</button></div>':'')+
     '</div>';
   }).join('');
 }
@@ -623,6 +623,7 @@ function renderCertCards(certsList) {
 let allInstructors = [];
 
 function openCertModal() {
+  editingCertId = null; editingCertStudentUid = null;
   document.getElementById('cf-number').value = '';
   document.getElementById('cf-date').value = '';
   document.getElementById('cf-notes').value = '';
@@ -688,7 +689,7 @@ async function saveCert() {
   var studentSnap = await db.collection('users').doc(studentUid).get();
   var studentData = studentSnap.data() || {};
   var photo = studentData.avatar || '';
-  await db.collection('users').doc(studentUid).collection('certs').add({
+  var certData = {
     agency: 'PSAI',
     level: level,
     number: document.getElementById('cf-number').value.trim(),
@@ -698,8 +699,18 @@ async function saveCert() {
     notes: document.getElementById('cf-notes').value.trim(),
     photo: photo,
     studentUid: studentUid
-  });
-  closeCertModalDirect(); showToast('✅ Certyfikat dodany!');
+  };
+  if (editingCertId) {
+    // Edycja
+    var ref = editingCertStudentUid ? db.collection('users').doc(editingCertStudentUid).collection('certs').doc(editingCertId) : certsCol.doc(editingCertId);
+    await ref.update(certData);
+    editingCertId = null; editingCertStudentUid = null;
+    closeCertModalDirect(); showToast('✅ Certyfikat zaktualizowany!');
+  } else {
+    // Nowy
+    await db.collection('users').doc(studentUid).collection('certs').add(certData);
+    closeCertModalDirect(); showToast('✅ Certyfikat dodany!');
+  }
   // Odśwież listę certyfikatów
   certsViewStudent = studentUid;
   await loadCertsForView();
@@ -718,6 +729,27 @@ async function loadCertsForView() {
     mySnap.forEach(function(doc) { certs.push({id:doc.id, ...doc.data()}); });
   }
 }
+
+let editingCertId = null, editingCertStudentUid = null;
+async function editCert(id, studentUid) {
+  editingCertId = id;
+  editingCertStudentUid = studentUid;
+  var certRef = studentUid ? db.collection('users').doc(studentUid).collection('certs').doc(id) : certsCol.doc(id);
+  var snap = await certRef.get();
+  var c = snap.data() || {};
+  document.getElementById('cf-number').value = c.number || '';
+  document.getElementById('cf-date').value = c.date || '';
+  document.getElementById('cf-notes').value = c.notes || '';
+  document.getElementById('cf-fname').value = (c.name||'').split(' ')[0] || '';
+  document.getElementById('cf-lname').value = (c.name||'').split(' ').slice(1).join(' ') || '';
+  // Otwórz modal
+  var sel = document.getElementById('cf-student');
+  sel.innerHTML = '<option value="'+(studentUid||'')+'">'+( c.name||'')+'</option>';
+  var levelSel = document.getElementById('cf-level');
+  levelSel.innerHTML = '<option value="'+(c.level||'')+'">'+(c.level||'')+'</option>';
+  document.getElementById('cert-modal').classList.add('open');
+}
+
 async function deleteCert(id) {
   if(!confirm('Usunąć ten certyfikat?'))return;
   var cert = certs.find(function(c){ return c.id === id; });
