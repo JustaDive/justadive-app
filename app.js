@@ -248,24 +248,14 @@ async function showApp(user) {
 
   // Logo szkoły w headerze
   const brandLogo = document.getElementById('brand-logo');
-  const brandName = document.getElementById('brand-name');
-  const brandSub = document.getElementById('brand-sub');
   if (currentSchoolLogo && currentSchoolLogo.startsWith('data:')) {
     brandLogo.src = currentSchoolLogo;
-    brandName.textContent = currentSchoolName || 'PSAI';
-    brandSub.textContent = '';
   } else if (currentSchoolLogo === 'justadive') {
     brandLogo.src = 'JustaDive/logotyp negatyw.png';
-    brandName.innerHTML = '<span class="just">Just</span> <span class="a">a</span> <span class="dive">dive</span>';
-    brandSub.textContent = 'Twoja Szkoła Nurkowania';
   } else if (currentSchoolLogo === 'dive-app') {
     brandLogo.src = 'austronaut_logo.jpg';
-    brandName.textContent = 'Dive App';
-    brandSub.textContent = '';
   } else {
     brandLogo.src = 'JustaDive/PSAI logo bez tła.png';
-    brandName.textContent = 'PSAI';
-    brandSub.textContent = '';
   }
   const badge = document.getElementById('role-badge');
   if (userRole==='admin') {
