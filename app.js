@@ -701,7 +701,6 @@ async function saveCert() {
 }
 async function deleteCert(id) {
   if(!confirm('Usunąć ten certyfikat?'))return;
-  // Admin: szukaj w certs array po ref
   var cert = certs.find(function(c){ return c.id === id; });
   if (cert && cert.ref) {
     await cert.ref.delete();
@@ -710,6 +709,9 @@ async function deleteCert(id) {
   } else {
     await certsCol.doc(id).delete();
   }
+  // Usuń z lokalnej listy i odśwież
+  certs = certs.filter(function(c){ return c.id !== id; });
+  renderCerts();
   showToast('🗑 Certyfikat usunięty');
 }
 
