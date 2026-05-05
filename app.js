@@ -1421,11 +1421,30 @@ async function approveCourseRequest(reqId,courseKey,userId){
 }
 
 async function unlockCourseForUser(courseKey){
-  var email=prompt('Email użytkownika:');if(!email)return;
-  var snap=await db.collection('users').where('email','==',email.trim()).get();
-  if(snap.empty){showToast('⚠️ Nie znaleziono');return;}
-  await db.collection('users').doc(snap.docs[0].id).update({enabledQuizzes:firebase.firestore.FieldValue.arrayUnion(courseKey)});
-  showToast('✅ Odblokowano!');
+  var html = '<div style="padding:20px;"><h3 style="margin-bottom:12px;">Odblokuj kurs dla:</h3><select id="unlock-user-sel" style="width:100%;margin-bottom:12px;">';
+  students.forEach(function(s){
+    var name = ((s.firstName||'')+' '+(s.lastName||'')).trim() || s.name || s.email;
+    html += '<option value="'+s.uid+'">'+name+' ('+s.email+')</option>';
+  });
+  html += '</select><button class="btn-primary" onclick="doUnlockCourse(\''+courseKey+'\')">Odblokuj</button> <button class="library-btn" onclick="document.getElementById(\'unlock-modal\').classList.remove(\'open\')">Anuluj</button></div>';
+  var modal = document.getElementById('unlock-modal');
+  if (!modal) {
+    modal = document.createElement('div');
+    modal.id = 'unlock-modal';
+    modal.className = 'modal-overlay';
+    modal.innerHTML = '<div class="modal"></div>';
+    document.body.appendChild(modal);
+  }
+  modal.querySelector('.modal').innerHTML = html;
+  modal.classList.add('open');
+}
+
+async function doUnlockCourse(courseKey){
+  var uid = document.getElementById('unlock-user-sel').value;
+  if (!uid) return;
+  await db.collection('users').doc(uid).update({enabledQuizzes:firebase.firestore.FieldValue.arrayUnion(courseKey)});
+  document.getElementById('unlock-modal').classList.remove('open');
+  showToast('✅ Kurs odblokowany!');
 }
 
 function openPdfModalForCourse(courseKey,type){
