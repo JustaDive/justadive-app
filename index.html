@@ -89,10 +89,6 @@
       <div class="card-title"><span class="accent">Kursy</span></div>
       <p style="font-size:0.76rem;color:var(--text-dim);margin-bottom:0;">Materiały szkoleniowe i egzaminy w jednym miejscu.</p>
     </div>
-    <details class="path-details">
-      <summary class="path-summary">Ścieżka uprawnień PSAI</summary>
-      <img src="sciezka uprawnien PSAI.png" alt="Ścieżka uprawnień PSAI" class="path-image">
-    </details>
     <div style="display:flex;gap:8px;margin-bottom:10px;align-items:center;">
       <input type="text" id="course-search" class="search-input" placeholder="Szukaj kursu..." oninput="renderCourses()" style="flex:1;">
       <button class="library-btn" onclick="courseSortAsc=!courseSortAsc;renderCourses();">A-Z ↕</button>
@@ -103,7 +99,7 @@
   <!-- Log Dive (Logbook) -->
   <div class="panel" id="panel-log">
     <div class="card">
-      <div class="card-title">🧭 Nowy <span class="accent">Wpis nurkowy</span></div>
+      <div class="card-title">Nowy <span class="accent">Wpis nurkowy</span></div>
       <div class="form-grid">
         <div class="form-group"><label>Miejsce nurkowania</label><input type="text" id="f-site" placeholder="np. Blue Hole, Dahab"></div>
         <div class="form-group"><label>Lokalizacja / Kraj</label><input type="text" id="f-location" placeholder="np. Egipt"></div>
@@ -160,17 +156,21 @@
   <!-- Certyfikaty -->
   <div class="panel active" id="panel-certs">
     <div class="card" style="margin-bottom:12px;">
-      <div class="card-title">🎓 Cyfrowe <span class="accent">Karty Uprawnień</span></div>
+      <div class="card-title"><span class="accent">Certyfikaty</span></div>
       <p style="font-size:0.76rem;color:var(--text-dim);margin-bottom:0;">Twoje certyfikaty nurkowe w jednym miejscu.</p>
     </div>
     <div class="certs-grid" id="certs-grid"></div>
+    <details class="path-details" style="margin-top:12px;">
+      <summary class="path-summary">Ścieżka uprawnień PSAI</summary>
+      <img src="sciezka uprawnien PSAI.png" alt="Ścieżka uprawnień PSAI" class="path-image">
+    </details>
     <button class="btn-add-cert" id="btn-add-cert" onclick="openCertModal()" style="margin-top:12px;width:100%;display:none;">+ Dodaj certyfikat</button>
   </div>
 
   <!-- Quiz -->
   <div class="panel" id="panel-quiz">
     <div class="quiz-card" id="quiz-container">
-      <div class="card-title">🧠 Test <span class="accent">wiedzy nurkowej</span></div>
+      <div class="card-title">Test <span class="accent">wiedzy nurkowej</span></div>
       <p style="font-size:0.76rem;color:var(--text-dim);margin-bottom:16px;">Wybierz kurs i sprawdź swoją wiedzę!</p>
       <div id="quiz-categories"></div>
     </div>
@@ -188,7 +188,7 @@
   <!-- Panel zarządzania (instruktor: kursanci, admin: wszyscy) -->
   <div class="panel" id="panel-manage">
     <div class="card">
-      <div class="card-title">👥 <span class="accent" id="manage-title">Zarządzanie</span></div>
+      <div class="card-title"><span class="accent" id="manage-title">Zarządzanie</span></div>
 
       <!-- Dodaj użytkownika -->
       <div style="margin-bottom:18px;">
