@@ -195,7 +195,11 @@
       <div style="margin-bottom:18px;">
         <label>Zaproś kursanta</label>
         <div style="display:flex;gap:8px;margin-top:4px;">
-          <input type="email" id="add-student-email" placeholder="email@kursanta.pl" style="flex:1;">
+          <input type="text" id="add-student-fname" placeholder="Imię" style="flex:1;">
+          <input type="text" id="add-student-lname" placeholder="Nazwisko" style="flex:1;">
+        </div>
+        <div style="display:flex;gap:8px;margin-top:4px;">
+          <input type="email" id="add-student-email" placeholder="Email" style="flex:1;">
           <button class="btn-primary" onclick="inviteStudent()" style="width:auto;margin:0;padding:10px 18px;">Zaproś</button>
         </div>
         <div id="invite-link-box" style="display:none;margin-top:8px;background:var(--bg-input);border:1px solid var(--border);border-radius:8px;padding:10px;">

@@ -216,17 +216,20 @@ async function chooseRole(role) {
   // Sprawdź zaproszenie
   var inviteCode = new URLSearchParams(window.location.search).get('invite');
   var instructorUid = '';
+  var invFirstName = '', invLastName = '';
   if (inviteCode) {
     var invSnap = await db.collection('invites').doc(inviteCode).get();
     if (invSnap.exists) {
       instructorUid = invSnap.data().instructorUid || '';
+      invFirstName = invSnap.data().firstName || '';
+      invLastName = invSnap.data().lastName || '';
       await db.collection('invites').doc(inviteCode).delete();
     }
   }
   await userDocRef.set({
     email: user.email,
-    name: user.displayName || user.email,
-    firstName: '', lastName: '',
+    name: (invFirstName + ' ' + invLastName).trim() || user.displayName || user.email,
+    firstName: invFirstName, lastName: invLastName,
     role: role,
     enabledQuizzes: [],
     schoolName: '',
@@ -858,18 +861,28 @@ async function loadStudents() {
 }
 async function inviteStudent() {
   var email = document.getElementById('add-student-email').value.trim();
+  var fname = document.getElementById('add-student-fname').value.trim();
+  var lname = document.getElementById('add-student-lname').value.trim();
   if (!email) { showToast('⚠️ Podaj email kursanta'); return; }
   var snap = await db.collection('users').where('email','==',email).get();
   if (!snap.empty) {
-    await db.collection('users').doc(snap.docs[0].id).update({ instructorUid: currentUser.uid });
+    // Już istnieje — przypisz + zaktualizuj imię jeśli podane
+    var updates = { instructorUid: currentUser.uid };
+    if (fname) updates.firstName = fname;
+    if (lname) updates.lastName = lname;
+    if (fname || lname) updates.name = (fname + ' ' + lname).trim();
+    await db.collection('users').doc(snap.docs[0].id).update(updates);
     document.getElementById('add-student-email').value = '';
+    document.getElementById('add-student-fname').value = '';
+    document.getElementById('add-student-lname').value = '';
     await loadStudents(); renderStudents();
     showToast('✅ Kursant przypisany!');
     return;
   }
   var inviteCode = Math.random().toString(36).substring(2, 10);
   await db.collection('invites').doc(inviteCode).set({
-    email: email, instructorUid: currentUser.uid, createdAt: new Date().toISOString()
+    email: email, firstName: fname, lastName: lname,
+    instructorUid: currentUser.uid, createdAt: new Date().toISOString()
   });
   var link = window.location.origin + window.location.pathname + '?invite=' + inviteCode;
   document.getElementById('invite-link-url').value = link;
