@@ -679,8 +679,8 @@ function openCertModal() {
 }
 
 async function loadInstructorsForCert() {
-  var snap = await db.collection('users').where('role','in',['instructor','admin']).get();
-  allInstructors = snap.docs.map(function(doc){ return {uid:doc.id, ...doc.data()}; });
+  var snap = await db.collection('users').get();
+  allInstructors = snap.docs.map(function(doc){ return {uid:doc.id, ...doc.data()}; }).filter(function(u){ return u.role==='instructor'||u.role==='admin'; });
   var sel = document.getElementById('cf-instructor-sel');
   sel.innerHTML = allInstructors.map(function(inst){
     var name = ((inst.firstName||'')+' '+(inst.lastName||'')).trim() || inst.name || inst.email;
