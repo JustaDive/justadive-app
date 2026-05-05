@@ -336,7 +336,7 @@ function hideApp() {
 // ─── Tabs ───
 function switchTab(tab) {
   const names = {
-    'Certyfikaty':'certs','Egzaminy':'quiz','Biblioteka':'library',
+    'Certyfikaty':'certs','Kursy':'library',
     'Logbook':'log','Sklep':'shop','Kursanci':'manage'
   };
   document.querySelectorAll('.tab').forEach(t => {
@@ -347,7 +347,7 @@ function switchTab(tab) {
   if (tab==='log') renderDives();
   if (tab==='certs') renderCerts();
   if (tab==='manage') renderStudents();
-  if (tab==='library') renderLibrary();
+  if (tab==='library') renderCourses();
   if (tab==='shop') renderShop();
 }
 
@@ -1293,37 +1293,126 @@ function listenLibrary() {
   });
 }
 
-function renderLibrary() {
-  var grid = document.getElementById('library-grid');
-  if (!libraryItems.length) {
-    grid.innerHTML = '<div class="empty-state"><span class="empty-icon">📚</span><h3>Brak materiałów</h3><p>Materiały pojawią się gdy admin je doda.</p></div>';
+let courseViewKey = null;
+
+function renderLibrary() { renderCourses(); }
+
+function renderCourses() {
+  var grid = document.getElementById('courses-grid');
+  if (!grid) return;
+  var isAdmin = userRole==='admin';
+  var isPriv = userRole==='admin'||userRole==='instructor';
+
+  if (!courseViewKey) {
+    var searchVal = (document.getElementById('course-search')||{}).value || '';
+    var courses = Object.entries(quizData).filter(function(e){ return e[1].name; });
+    if (searchVal) {
+      var q = searchVal.toLowerCase();
+      courses = courses.filter(function(e){ return e[1].name.toLowerCase().indexOf(q)>=0; });
+    }
+    var html = '';
+    if (isAdmin) { html += '<div id="course-requests" style="margin-bottom:10px;"></div>'; }
+    html += courses.map(function(e){
+      var k=e[0], cat=e[1];
+      var unlocked = isAdmin || (myEnabledQuizzes||[]).includes(k);
+      return '<div class="student-card" style="'+(unlocked?'':'opacity:0.5;')+'" '+(unlocked?'onclick="openCourse(\''+k+'\')"':'')+'>'+
+        '<div class="student-info"><div class="student-name">'+cat.name+'</div>'+
+        '<div class="student-email">'+(unlocked?'Odblokowany':'🔒 Zablokowany')+'</div></div>'+
+        (isPriv&&!unlocked?'<button class="library-btn" onclick="event.stopPropagation();requestCourse(\''+k+'\',\''+cat.name+'\')">Poproś o otwarcie</button>':'')+
+        (isAdmin?'<button class="library-btn" onclick="event.stopPropagation();unlockCourseForUser(\''+k+'\')">Odblokuj</button>':'')+
+        (unlocked?'<div style="color:var(--blue);font-size:0.8rem;">→</div>':'')+
+        '</div>';
+    }).join('');
+    grid.innerHTML = html;
+    if (isAdmin) loadCourseRequests();
     return;
   }
-  var isAdmin = userRole==='admin';
-  var isPrivileged = userRole==='admin'||userRole==='instructor';
-  // Grupuj po kategorii
-  var groups = {};
-  libraryItems.forEach(function(item){
-    var cat = item.category || 'Inne';
-    if (!groups[cat]) groups[cat] = [];
-    groups[cat].push(item);
-  });
-  var html = '';
-  Object.keys(groups).forEach(function(cat){
-    html += '<div style="font-size:0.68rem;font-weight:800;color:var(--text-dim);letter-spacing:1.5px;text-transform:uppercase;margin:12px 0 6px;">'+cat+'</div>';
-    groups[cat].forEach(function(item){
-      var unlocked = isPrivileged || (item.unlockedFor||[]).includes(currentUser.uid);
-      html += '<div class="library-item">'+
-        '<div class="library-icon">📄</div>'+
-        '<div class="library-info"><div class="library-title">'+item.title+'</div></div>'+
-        (unlocked ? '<a href="'+item.url+'" target="_blank" class="library-btn">📥 Pobierz</a>' : '<div class="library-locked">🔒</div>')+
-        (isPrivileged ? ' <button class="library-btn" onclick="unlockLibItem(\''+item.id+'\')" style="margin-left:4px;">🔓 Udostępnij</button>' : '')+
-        (isAdmin ? ' <button class="library-btn" onclick="renameLibItem(\''+item.id+'\')" style="margin-left:4px;">✏️</button>' : '')+
-        (isAdmin ? ' <button class="btn-delete" onclick="deleteLibItem(\''+item.id+'\')" style="margin-left:4px;">🗑</button>' : '')+
-        '</div>';
-    });
-  });
+
+  var cat = quizData[courseViewKey]||{};
+  var courseItems = libraryItems.filter(function(item){ return item.courseKey===courseViewKey; });
+  var html = '<div style="margin-bottom:12px;"><button class="library-btn" onclick="courseViewKey=null;renderCourses();">← Wróć do listy</button> <span style="font-weight:700;margin-left:8px;">'+cat.name+'</span></div>';
+  html += '<div class="certs-cards-grid">';
+  var docs=courseItems.filter(function(i){return i.type==='dokumenty';});
+  html += '<div class="cert-card" style="padding:16px;cursor:pointer;" onclick="openCourseMaterial(\''+courseViewKey+'\',\'dokumenty\')"><div style="font-size:1.4rem;text-align:center;margin-bottom:8px;">📋</div><div style="text-align:center;font-weight:700;font-size:0.78rem;">Dokumenty</div><div style="text-align:center;font-size:0.6rem;color:var(--text-dim);margin-top:4px;">'+docs.length+' plików</div></div>';
+  var books=courseItems.filter(function(i){return i.type==='podręcznik';});
+  html += '<div class="cert-card" style="padding:16px;cursor:pointer;" onclick="openCourseMaterial(\''+courseViewKey+'\',\'podręcznik\')"><div style="font-size:1.4rem;text-align:center;margin-bottom:8px;">📖</div><div style="text-align:center;font-weight:700;font-size:0.78rem;">Podręcznik</div><div style="text-align:center;font-size:0.6rem;color:var(--text-dim);margin-top:4px;">'+books.length+' plików</div></div>';
+  var pres=courseItems.filter(function(i){return i.type==='prezentacja';});
+  html += '<div class="cert-card" style="padding:16px;cursor:pointer;" onclick="openCourseMaterial(\''+courseViewKey+'\',\'prezentacja\')"><div style="font-size:1.4rem;text-align:center;margin-bottom:8px;">📊</div><div style="text-align:center;font-weight:700;font-size:0.78rem;">Prezentacja</div><div style="text-align:center;font-size:0.6rem;color:var(--text-dim);margin-top:4px;">'+pres.length+' plików</div></div>';
+  var hasQ=(cat.questions||[]).length>0;
+  html += '<div class="cert-card" style="padding:16px;cursor:pointer;" onclick="startCourseTest(\''+courseViewKey+'\')"><div style="font-size:1.4rem;text-align:center;margin-bottom:8px;">🧠</div><div style="text-align:center;font-weight:700;font-size:0.78rem;">Test</div><div style="text-align:center;font-size:0.6rem;color:var(--text-dim);margin-top:4px;">'+(hasQ?(cat.questions.length+' pytań'):'Brak pytań')+'</div></div>';
+  html += '</div><div id="course-test-result" style="margin-top:12px;"></div>';
+  if (isAdmin) html += '<button class="btn-add-cert" onclick="openPdfModalForCourse(\''+courseViewKey+'\')" style="margin-top:8px;width:100%;">+ Dodaj materiał</button>';
   grid.innerHTML = html;
+  loadCourseTestResult(courseViewKey);
+}
+
+function openCourse(key){courseViewKey=key;renderCourses();}
+
+function openCourseMaterial(courseKey,type){
+  var items=libraryItems.filter(function(i){return i.courseKey===courseKey&&i.type===type;});
+  var grid=document.getElementById('courses-grid');
+  var cat=quizData[courseKey]||{};
+  var isAdmin=userRole==='admin';
+  var html='<div style="margin-bottom:12px;"><button class="library-btn" onclick="openCourse(\''+courseKey+'\')">← Wróć</button> <span style="font-weight:700;margin-left:8px;">'+cat.name+' — '+type+'</span></div>';
+  if(!items.length){html+='<div class="empty-state"><h3>Brak materiałów</h3></div>';}
+  else{items.forEach(function(item){
+    html+='<div class="library-item"><div class="library-icon">📄</div><div class="library-info"><div class="library-title">'+item.title+'</div></div>';
+    html+='<a href="'+item.url+'" target="_blank" class="library-btn">Otwórz</a>';
+    if(type==='dokumenty')html+='<div style="font-size:0.55rem;color:var(--text-dim);margin-left:6px;">Odeślij po podpisaniu</div>';
+    if(isAdmin)html+=' <button class="btn-delete" onclick="deleteLibItem(\''+item.id+'\')" style="margin-left:4px;">🗑</button>';
+    html+='</div>';
+  });}
+  if(isAdmin)html+='<button class="btn-add-cert" onclick="openPdfModalForCourse(\''+courseKey+'\',\''+type+'\')" style="margin-top:8px;width:100%;">+ Dodaj</button>';
+  grid.innerHTML=html;
+}
+
+function startCourseTest(key){startQuiz(key);}
+
+async function loadCourseTestResult(key){
+  var el=document.getElementById('course-test-result');if(!el)return;
+  try{var snap=await db.collection('quizResults').where('userId','==',currentUser.uid).where('category','==',key).limit(5).get();
+  if(snap.empty){el.innerHTML='<div style="font-size:0.72rem;color:var(--text-dim);">Brak wyników testu</div>';return;}
+  var html='<div style="font-size:0.72rem;font-weight:700;color:var(--text-dim);margin-bottom:6px;">Wyniki testu:</div>';
+  snap.forEach(function(doc){var r=doc.data();var color=r.percent>=80?'#22c55e':r.percent>=50?'#f59e0b':'var(--danger)';
+    html+='<div style="display:flex;justify-content:space-between;padding:4px 0;font-size:0.72rem;"><span>'+(r.date||'').substring(0,10)+'</span><span style="font-weight:800;color:'+color+';">'+r.percent+'%</span></div>';});
+  el.innerHTML=html;}catch(e){el.innerHTML='';}
+}
+
+async function requestCourse(key,name){
+  await db.collection('courseRequests').add({courseKey:key,courseName:name,userId:currentUser.uid,userName:currentUser.displayName||currentUser.email,userEmail:currentUser.email,date:new Date().toISOString(),status:'pending'});
+  showToast('✅ Prośba wysłana!');
+}
+
+async function loadCourseRequests(){
+  var el=document.getElementById('course-requests');if(!el)return;
+  var snap=await db.collection('courseRequests').where('status','==','pending').get();
+  if(snap.empty){el.innerHTML='';return;}
+  var html='<div style="font-size:0.68rem;font-weight:700;color:var(--text-dim);margin-bottom:4px;">Prośby o otwarcie:</div>';
+  snap.forEach(function(doc){var r=doc.data();
+    html+='<div class="library-item" style="margin-bottom:4px;background:rgba(255,180,0,0.08);"><div class="library-info"><div class="library-title">'+r.userName+'</div><div style="font-size:0.6rem;color:var(--text-dim);">'+r.courseName+'</div></div><button class="library-btn" onclick="approveCourseRequest(\''+doc.id+'\',\''+r.courseKey+'\',\''+r.userId+'\')">Odblokuj</button></div>';});
+  el.innerHTML=html;
+}
+
+async function approveCourseRequest(reqId,courseKey,userId){
+  await db.collection('users').doc(userId).update({enabledQuizzes:firebase.firestore.FieldValue.arrayUnion(courseKey)});
+  await db.collection('courseRequests').doc(reqId).update({status:'approved'});
+  loadCourseRequests();showToast('✅ Kurs odblokowany!');
+}
+
+async function unlockCourseForUser(courseKey){
+  var email=prompt('Email użytkownika:');if(!email)return;
+  var snap=await db.collection('users').where('email','==',email.trim()).get();
+  if(snap.empty){showToast('⚠️ Nie znaleziono');return;}
+  await db.collection('users').doc(snap.docs[0].id).update({enabledQuizzes:firebase.firestore.FieldValue.arrayUnion(courseKey)});
+  showToast('✅ Odblokowano!');
+}
+
+function openPdfModalForCourse(courseKey,type){
+  document.getElementById('pdf-title').value='';
+  document.getElementById('pdf-url').value='';
+  document.getElementById('pdf-category').value=type||'Podręcznik';
+  document.getElementById('pdf-modal').dataset.courseKey=courseKey;
+  document.getElementById('pdf-modal').classList.add('open');
 }
 
 function openPdfModal() {
@@ -1337,9 +1426,12 @@ async function savePdf() {
   var title = document.getElementById('pdf-title').value.trim();
   var url = document.getElementById('pdf-url').value.trim();
   if (!title||!url) { showToast('⚠️ Podaj tytuł i link'); return; }
+  var modal = document.getElementById('pdf-modal');
   await db.collection('library').add({
     title: title,
     category: document.getElementById('pdf-category').value.trim(),
+    type: document.getElementById('pdf-category').value.trim().toLowerCase(),
+    courseKey: modal.dataset.courseKey || '',
     url: url,
     unlockedFor: []
   });
