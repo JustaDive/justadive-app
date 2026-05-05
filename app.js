@@ -158,6 +158,13 @@ let pendingNewUser = null;
 
 auth.onAuthStateChanged(async user => {
   if (user) {
+    // Tryb maintenance — tylko admin
+    if (user.email !== 'damianbiniarz@gmail.com') {
+      auth.signOut();
+      document.getElementById('login-error').textContent = 'Aplikacja tymczasowo niedostępna. Trwają prace techniczne.';
+      document.getElementById('login-error').style.display = 'block';
+      return;
+    }
     currentUser = user;
     var ready = await loadUserProfile(user);
     if (ready) showApp(user);
