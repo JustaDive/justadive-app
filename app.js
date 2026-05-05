@@ -883,7 +883,10 @@ function renderStudents() {
   el.innerHTML = students.map(s=>{
     const en=(s.enabledQuizzes||[]).length, tot=Object.keys(quizData).length;
     const fullName = ((s.firstName||'') + ' ' + (s.lastName||'')).trim() || s.name || '';
-    return '<div class="student-card" onclick="openStudentModal(\''+s.uid+'\')"><div class="student-info"><div class="student-name">'+fullName+'</div><div class="student-email">'+s.email+'</div></div><div class="student-quizzes">'+en+'/'+tot+' egz.</div></div>';
+    var roleColor = s.role==='admin' ? 'rgba(255,180,0,0.12)' : s.role==='instructor' ? 'rgba(228,57,70,0.12)' : 'rgba(41,171,226,0.12)';
+    var roleBorder = s.role==='admin' ? 'rgba(255,180,0,0.4)' : s.role==='instructor' ? 'rgba(228,57,70,0.4)' : 'rgba(41,171,226,0.4)';
+    var roleLabel = s.role==='admin' ? 'Admin' : s.role==='instructor' ? 'Instruktor' : 'Kursant';
+    return '<div class="student-card" style="background:'+roleColor+';border-color:'+roleBorder+';" onclick="openStudentModal(\''+s.uid+'\')"><div class="student-info"><div class="student-name">'+fullName+'</div><div class="student-email">'+s.email+' · <strong>'+roleLabel+'</strong></div></div><div class="student-quizzes">'+en+'/'+tot+' egz.</div></div>';
   }).join('');
 }
 function openStudentModal(uid) {
