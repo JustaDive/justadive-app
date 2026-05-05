@@ -903,7 +903,7 @@ function renderStudents() {
     var roleColor = s.role==='admin' ? 'rgba(255,180,0,0.12)' : s.role==='instructor' ? 'rgba(228,57,70,0.12)' : 'rgba(41,171,226,0.12)';
     var roleBorder = s.role==='admin' ? 'rgba(255,180,0,0.4)' : s.role==='instructor' ? 'rgba(228,57,70,0.4)' : 'rgba(41,171,226,0.4)';
     var roleLabel = s.role==='admin' ? 'Admin' : s.role==='instructor' ? 'Instruktor' : 'Kursant';
-    return '<div class="student-card" style="background:'+roleColor+';border-color:'+roleBorder+';" onclick="openStudentModal(\''+s.uid+'\')"><div class="student-info"><div class="student-name">'+fullName+'</div><div class="student-email">'+s.email+' · <strong>'+roleLabel+'</strong></div></div><div class="student-quizzes">'+en+'/'+tot+' egz.</div></div>';
+    return '<div class="student-card" style="background:'+roleColor+';border-color:'+roleBorder+';" onclick="openStudentModal(\''+s.uid+'\')"><div class="student-info"><div class="student-name">'+fullName+'</div><div class="student-email">'+s.email+' · <strong>'+roleLabel+'</strong></div></div><div style="display:flex;gap:6px;align-items:center;"><div class="student-quizzes">'+en+'/'+tot+' egz.</div>'+(userRole==='admin'?'<button class="btn-delete" onclick="event.stopPropagation();deleteUser(\''+s.uid+'\',\''+s.email+'\')" style="padding:4px 8px;font-size:0.6rem;">🗑</button>':'')+'</div></div>';
   }).join('');
 }
 function openStudentModal(uid) {
@@ -1243,6 +1243,18 @@ function showResultDetail(idx) {
 
 
 // ─── Admin: load all users & change roles ───
+async function deleteUser(uid, email) {
+  if (!confirm('Usunąć użytkownika '+email+'? To usunie jego dane z aplikacji.')) return;
+  // Usuń certyfikaty
+  var certsSnap = await db.collection('users').doc(uid).collection('certs').get();
+  certsSnap.forEach(function(doc){ doc.ref.delete(); });
+  // Usuń dokument użytkownika
+  await db.collection('users').doc(uid).delete();
+  students = students.filter(function(s){ return s.uid !== uid; });
+  renderStudents();
+  showToast('🗑 Użytkownik usunięty');
+}
+
 async function loadAllUsers() {
   const snap = await db.collection('users').get();
   students = snap.docs.map(doc=>({uid:doc.id,...doc.data()}));
