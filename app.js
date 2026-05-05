@@ -581,7 +581,9 @@ function renderCerts() {
     var html = '<div style="display:flex;gap:8px;margin-bottom:10px;align-items:center;"><input type="text" id="cert-search" class="search-input" placeholder="Szukaj kursanta..." oninput="renderCertsFiltered()" value="'+searchVal+'" style="flex:1;"><button class="library-btn" onclick="certSortAsc=!certSortAsc;renderCertsFiltered();">A-Z ↕</button></div>';
     html += '<div id="cert-student-list">' + sorted.map(function(s) {
       var name = ((s.firstName||'')+ ' '+(s.lastName||'')).trim() || s.name || s.email;
-      return '<div class="student-card" onclick="viewStudentCerts(\''+s.uid+'\')"><div class="student-info"><div class="student-name">'+name+'</div><div class="student-email">'+s.email+'</div></div><div style="color:var(--blue);font-size:0.8rem;">→</div></div>';
+      var rc = s.role==='admin' ? 'rgba(255,180,0,0.12)' : s.role==='instructor' ? 'rgba(228,57,70,0.12)' : 'rgba(41,171,226,0.12)';
+      var rb = s.role==='admin' ? 'rgba(255,180,0,0.4)' : s.role==='instructor' ? 'rgba(228,57,70,0.4)' : 'rgba(41,171,226,0.4)';
+      return '<div class="student-card" style="background:'+rc+';border-color:'+rb+';" onclick="viewStudentCerts(\''+s.uid+'\')"><div class="student-info"><div class="student-name">'+name+'</div><div class="student-email">'+s.email+'</div></div><div style="color:var(--blue);font-size:0.8rem;">→</div></div>';
     }).join('') + '</div>';
     grid.innerHTML = html;
     return;
@@ -624,7 +626,9 @@ function renderCertsFiltered() {
   if (listEl) {
     listEl.innerHTML = sorted.map(function(s) {
       var name = ((s.firstName||'')+ ' '+(s.lastName||'')).trim() || s.name || s.email;
-      return '<div class="student-card" onclick="viewStudentCerts(\''+s.uid+'\')"><div class="student-info"><div class="student-name">'+name+'</div><div class="student-email">'+s.email+'</div></div><div style="color:var(--blue);font-size:0.8rem;">→</div></div>';
+      var rc = s.role==='admin' ? 'rgba(255,180,0,0.12)' : s.role==='instructor' ? 'rgba(228,57,70,0.12)' : 'rgba(41,171,226,0.12)';
+      var rb = s.role==='admin' ? 'rgba(255,180,0,0.4)' : s.role==='instructor' ? 'rgba(228,57,70,0.4)' : 'rgba(41,171,226,0.4)';
+      return '<div class="student-card" style="background:'+rc+';border-color:'+rb+';" onclick="viewStudentCerts(\''+s.uid+'\')"><div class="student-info"><div class="student-name">'+name+'</div><div class="student-email">'+s.email+'</div></div><div style="color:var(--blue);font-size:0.8rem;">→</div></div>';
     }).join('');
   }
 }
