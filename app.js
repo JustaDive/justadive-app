@@ -679,6 +679,7 @@ function openCertModal() {
 }
 
 async function loadInstructorsForCert() {
+  try {
   var snap = await db.collection('users').get();
   allInstructors = snap.docs.map(function(doc){ return {uid:doc.id, ...doc.data()}; }).filter(function(u){ return u.role==='instructor'||u.role==='admin'; });
   var sel = document.getElementById('cf-instructor-sel');
@@ -688,6 +689,7 @@ async function loadInstructorsForCert() {
   }).join('') + '<option value="__other__">— Inny instruktor (wpisz ręcznie) —</option>';
   sel.onchange = onInstructorChange;
   onInstructorChange();
+  } catch(e) { showToast('⚠️ Błąd: '+e.message); }
 }
 
 function onInstructorChange() {
