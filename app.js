@@ -641,7 +641,7 @@ function renderCertCards(certsList) {
     var agency = (c.agency||'PSAI').toUpperCase();
     return '<div>'+
       '<div class="cert-card"><div class="cert-back">'+
-        '<div class="cert-back-header">PSAI '+(c.level||'Certyfikat')+'</div>'+
+        '<div class="cert-back-header">'+((c.level||'').toUpperCase().indexOf('PSAI')>=0 ? (c.level||'Certyfikat') : 'PSAI '+(c.level||'Certyfikat'))+'</div>'+
         '<div class="cert-back-body">'+
           '<div class="cert-back-row">'+
             '<img src="JustaDive/PSAI logo bez tła.png" alt="PSAI" class="cert-back-logo">'+
@@ -811,7 +811,11 @@ async function editCert(id, studentUid) {
   var sel = document.getElementById('cf-student');
   sel.innerHTML = '<option value="'+(studentUid||'')+'">'+( c.name||'')+'</option>';
   var levelSel = document.getElementById('cf-level');
-  levelSel.innerHTML = '<option value="'+(c.level||'')+'">'+(c.level||'')+'</option>';
+  levelSel.innerHTML = '<option value="">— Wybierz kurs —</option><option value="__other__">— Inny kurs (wpisz ręcznie) —</option>' + Object.values(quizData).map(function(cat){ return '<option value="'+cat.name+'"'+(cat.name===c.level?' selected':'')+'>'+cat.name+'</option>'; }).join('');
+  if (c.level && !Object.values(quizData).some(function(cat){return cat.name===c.level;})) {
+    levelSel.innerHTML += '<option value="'+c.level+'" selected>'+c.level+'</option>';
+  }
+  levelSel.onchange = function(){ if(levelSel.value==='__other__'){ var v=prompt('Wpisz nazwę kursu:'); if(v){levelSel.innerHTML+='<option value="'+v+'" selected>'+v+'</option>';} else {levelSel.value='';} } };
   await loadInstructorsForCert();
   // Ustaw instruktora z certyfikatu
   var instSel = document.getElementById('cf-instructor-sel');
