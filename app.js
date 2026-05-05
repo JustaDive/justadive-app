@@ -1333,6 +1333,7 @@ function renderCourses() {
       courses = courses.filter(function(e){ return e[1].name.toLowerCase().indexOf(q)>=0; });
     }
     var html = '';
+    html += '<details class="path-details" style="margin-bottom:10px;"><summary class="path-summary">Ścieżka uprawnień PSAI</summary><img src="sciezka uprawnien PSAI.png" alt="Ścieżka uprawnień PSAI" class="path-image"></details>';
     if (isAdmin) { html += '<div id="course-requests" style="margin-bottom:10px;"></div>'; }
     html += courses.map(function(e){
       var k=e[0], cat=e[1];
