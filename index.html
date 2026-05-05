@@ -93,8 +93,9 @@
       <summary class="path-summary">Ścieżka uprawnień PSAI</summary>
       <img src="sciezka uprawnien PSAI.png" alt="Ścieżka uprawnień PSAI" class="path-image">
     </details>
-    <div style="margin-bottom:10px;">
-      <input type="text" id="course-search" class="search-input" placeholder="Szukaj kursu..." oninput="renderCourses()">
+    <div style="display:flex;gap:8px;margin-bottom:10px;align-items:center;">
+      <input type="text" id="course-search" class="search-input" placeholder="Szukaj kursu..." oninput="renderCourses()" style="flex:1;">
+      <button class="library-btn" onclick="courseSortAsc=!courseSortAsc;renderCourses();">A-Z ↕</button>
     </div>
     <div id="courses-grid"></div>
   </div>

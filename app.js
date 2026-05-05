@@ -1314,6 +1314,7 @@ function listenLibrary() {
 }
 
 let courseViewKey = null;
+let courseSortAsc = true;
 
 function renderLibrary() { renderCourses(); }
 
@@ -1325,7 +1326,7 @@ function renderCourses() {
 
   if (!courseViewKey) {
     var searchVal = (document.getElementById('course-search')||{}).value || '';
-    var courses = Object.entries(quizData).filter(function(e){ return e[1].name; });
+    var courses = Object.entries(quizData).filter(function(e){ return e[1].name; }).sort(function(a,b){ return courseSortAsc ? a[1].name.localeCompare(b[1].name) : b[1].name.localeCompare(a[1].name); });
     if (searchVal) {
       var q = searchVal.toLowerCase();
       courses = courses.filter(function(e){ return e[1].name.toLowerCase().indexOf(q)>=0; });
