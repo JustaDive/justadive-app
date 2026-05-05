@@ -1338,13 +1338,14 @@ function renderCourses() {
     html += courses.map(function(e){
       var k=e[0], cat=e[1];
       var unlocked = isAdmin || (myEnabledQuizzes||[]).includes(k);
-      return '<div class="student-card" style="'+(unlocked?'':'opacity:0.5;')+'" '+(unlocked?'onclick="openCourse(\''+k+'\')"':'')+'>'+
+      return '<div class="student-card" style="'+(unlocked?'':'opacity:0.6;cursor:default;')+'" '+(unlocked?'onclick="openCourse(\''+k+'\')"':'')+'>'+
         '<div class="student-info"><div class="student-name">'+cat.name+'</div>'+
         '<div class="student-email">'+(unlocked?'Odblokowany':'🔒 Zablokowany')+'</div></div>'+
-        (isPriv&&!unlocked?'<button class="library-btn" onclick="event.stopPropagation();requestCourse(\''+k+'\',\''+cat.name+'\')">Poproś o otwarcie</button>':'')+
-        (isAdmin?'<button class="library-btn" onclick="event.stopPropagation();unlockCourseForUser(\''+k+'\')">Odblokuj</button>':'')+
+        '<div style="display:flex;gap:6px;align-items:center;">'+
+        (isPriv&&!unlocked?'<button class="library-btn" onclick="event.stopPropagation();requestCourse(\''+k+'\',\''+cat.name+'\')">Poproś</button>':'')+
+        (isAdmin&&!unlocked?'<button class="library-btn" onclick="event.stopPropagation();unlockCourseForUser(\''+k+'\')">Odblokuj</button>':'')+
         (unlocked?'<div style="color:var(--blue);font-size:0.8rem;">→</div>':'')+
-        '</div>';
+        '</div></div>';
     }).join('');
     grid.innerHTML = html;
     if (isAdmin) loadCourseRequests();
