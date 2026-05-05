@@ -276,7 +276,6 @@ async function showApp(user) {
     document.getElementById('tabs-instructor').style.display='none';
     document.getElementById('tabs-admin').style.display='flex';
     document.getElementById('btn-add-cert').style.display='';
-    document.getElementById('btn-add-pdf').style.display='';
     document.getElementById('admin-role-section').style.display='';
     loadAllUsers();
   } else if (userRole==='instructor') {
@@ -285,7 +284,6 @@ async function showApp(user) {
     document.getElementById('tabs-instructor').style.display='flex';
     document.getElementById('tabs-admin').style.display='none';
     document.getElementById('btn-add-cert').style.display='none';
-    document.getElementById('btn-add-pdf').style.display='none';
     document.getElementById('admin-role-section').style.display='none';
     loadStudents();  } else {
     badge.textContent='🎓 Kursant'; badge.className='role-badge student';
@@ -293,7 +291,6 @@ async function showApp(user) {
     document.getElementById('tabs-instructor').style.display='none';
     document.getElementById('tabs-admin').style.display='none';
     document.getElementById('btn-add-cert').style.display='none';
-    document.getElementById('btn-add-pdf').style.display='none';
     document.getElementById('admin-role-section').style.display='none';
   }
   divesCol = userDocRef.collection('dives');
