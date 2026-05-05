@@ -1096,12 +1096,33 @@ function parseTxtQuestions(text) {
   return questions;
 }
 
+var quizTimer = null;
+var quizTimeLeft = 0;
+
 function startQuiz(k) {
   var cat = quizData[k];
   if (!cat||!cat.questions||!cat.questions.length) { showToast('⚠️ Brak pytań'); return; }
   var pool = cat.questions.slice().sort(function(){return Math.random()-0.5;});
   var qs = pool.slice(0, Math.min(QUIZ_QUESTIONS_PER_TEST, pool.length));
   quizState = { catKey:k, catName:cat.name, questions:qs, current:0, score:0, total:qs.length, errors:[] };
+  // Timer 60 minut
+  quizTimeLeft = 60 * 60;
+  if (quizTimer) clearInterval(quizTimer);
+  quizTimer = setInterval(function(){
+    quizTimeLeft--;
+    var el = document.getElementById('quiz-timer');
+    if (el) {
+      var m = Math.floor(quizTimeLeft/60);
+      var s = quizTimeLeft%60;
+      el.textContent = m+':'+(s<10?'0':'')+s;
+      if (quizTimeLeft <= 300) el.style.color = 'var(--danger)';
+    }
+    if (quizTimeLeft <= 0) {
+      clearInterval(quizTimer); quizTimer = null;
+      showToast('⏰ Czas minął!');
+      finishQuiz();
+    }
+  }, 1000);
   renderQuizQuestion();
 }
 
@@ -1109,7 +1130,8 @@ function renderQuizQuestion() {
   var s = quizState, c = document.getElementById('quiz-container');
   if (s.current >= s.total) { finishQuiz(); return; }
   var q = s.questions[s.current];
-  c.innerHTML = '<div class="quiz-progress"><div class="quiz-progress-bar"><div class="quiz-progress-fill" style="width:'+(s.current/s.total*100)+'%"></div></div><div class="quiz-progress-text">'+(s.current+1)+'/'+s.total+'</div></div>'+
+  var m=Math.floor(quizTimeLeft/60), sec=quizTimeLeft%60;
+  c.innerHTML = '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;"><div class="quiz-progress" style="flex:1;margin-bottom:0;"><div class="quiz-progress-bar"><div class="quiz-progress-fill" style="width:'+(s.current/s.total*100)+'%"></div></div><div class="quiz-progress-text">'+(s.current+1)+'/'+s.total+'</div></div><div id="quiz-timer" style="font-size:0.82rem;font-weight:800;color:var(--blue);margin-left:12px;">'+m+':'+(sec<10?'0':'')+sec+'</div></div>'+
     '<div class="quiz-question">'+q.q+'</div>'+
     '<div class="quiz-answers" id="quiz-answers">'+q.a.map(function(a,i){return '<button class="quiz-answer" onclick="answerQuiz('+i+')">'+a+'</button>';}).join('')+'</div>'+
     '<button class="btn-quit" onclick="quitQuiz()">✕ Przerwij egzamin</button>';
@@ -1129,6 +1151,7 @@ function answerQuiz(idx) {
 }
 
 async function finishQuiz() {
+  if (quizTimer) { clearInterval(quizTimer); quizTimer = null; }
   var s = quizState;
   var pct = Math.round((s.score/s.total)*100);
   var msg = pct>=80?'🎉 Świetny wynik!':pct>=50?'👍 Nieźle, powtórz materiał!':'📚 Musisz poćwiczyć!';
@@ -1142,7 +1165,7 @@ async function finishQuiz() {
   document.getElementById('quiz-container').innerHTML = '<div class="quiz-result"><div class="quiz-result-title">'+s.catName+'</div><div class="quiz-result-score">'+pct+'%</div><div class="quiz-result-text">'+s.score+'/'+s.total+' — '+msg+'</div>'+errHtml+'<button class="btn-primary" onclick="resetQuiz()" style="margin-top:16px;">🔄 Wróć</button></div>';
 }
 
-function quitQuiz() { if(confirm('Przerwać egzamin?')) resetQuiz(); }
+function quitQuiz() { if(confirm('Przerwać egzamin?')){ if(quizTimer){clearInterval(quizTimer);quizTimer=null;} resetQuiz(); } }
 
 function resetQuiz() {
   quizState = null;
