@@ -672,7 +672,7 @@ function openCertModal() {
   fillCertStudent();
   // Wypełnij listę kursów
   var levelSel = document.getElementById('cf-level');
-  levelSel.innerHTML = '<option value="">— Wybierz kurs —</option>' + Object.values(defaultQuizCategories).map(function(c){ return '<option value="'+c.name+'">'+c.name+'</option>'; }).join('');
+  levelSel.innerHTML = '<option value="">— Wybierz kurs —</option>' + Object.values(quizData).map(function(c){ return '<option value="'+c.name+'">'+c.name+'</option>'; }).join('');
   // Wypełnij listę instruktorów
   loadInstructorsForCert();
   document.getElementById('cert-modal').classList.add('open');
@@ -921,6 +921,7 @@ function renderQuizCategories() {
   // Przyciski funkcyjne — kafelki jak testy
   if (isAdmin || isPriv || userRole === 'student') {
     if (isAdmin) {
+      html += '<div class="quiz-cat quiz-cat-action" onclick="addQuizCategory()" style="cursor:pointer;"><div class="quiz-cat-name">Dodaj kategorię</div></div>';
       html += '<div class="quiz-cat quiz-cat-action" onclick="openUploadQuiz()" style="cursor:pointer;"><div class="quiz-cat-name">Załaduj pytania</div></div>';
       html += '<div class="quiz-cat quiz-cat-action" onclick="downloadQuizTxt()" style="cursor:pointer;"><div class="quiz-cat-name">Pobierz pytania</div></div>';
     }
@@ -944,6 +945,17 @@ function renderQuizCategories() {
       '</div>';
   }).join('');
   el.innerHTML = html;
+}
+
+async function addQuizCategory() {
+  var name = prompt('Nazwa nowej kategorii szkolenia:');
+  if (!name) return;
+  var key = name.toLowerCase().replace(/\s+/g,'_').replace(/[^a-z0-9_]/g,'');
+  if (!key) { showToast('⚠️ Nieprawidłowa nazwa'); return; }
+  await db.collection('quizCategories').doc(key).set({ name:name, icon:'📝', questions:[] });
+  quizData[key] = { name:name, icon:'📝', questions:[] };
+  renderQuizCategories();
+  showToast('✅ Kategoria "'+name+'" dodana!');
 }
 
 async function deleteQuizCategory(key) {
