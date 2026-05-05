@@ -679,7 +679,8 @@ function openCertModal() {
   fillCertStudent();
   // Wypełnij listę kursów
   var levelSel = document.getElementById('cf-level');
-  levelSel.innerHTML = '<option value="">— Wybierz kurs —</option>' + Object.values(quizData).map(function(c){ return '<option value="'+c.name+'">'+c.name+'</option>'; }).join('');
+  levelSel.innerHTML = '<option value="">— Wybierz kurs —</option>' + Object.values(quizData).map(function(c){ return '<option value="'+c.name+'">'+c.name+'</option>'; }).join('') + '<option value="__other__">— Inny kurs (wpisz ręcznie) —</option>';
+  levelSel.onchange = function(){ if(levelSel.value==='__other__'){ var v=prompt('Wpisz nazwę kursu:'); if(v){levelSel.innerHTML+='<option value="'+v+'" selected>'+v+'</option>';} else {levelSel.value='';} } };
   // Wypełnij listę instruktorów
   loadInstructorsForCert();
   document.getElementById('cert-modal').classList.add('open');
