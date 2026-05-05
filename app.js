@@ -579,6 +579,7 @@ function renderCerts() {
       });
     }
     var html = '<div style="display:flex;gap:8px;margin-bottom:10px;align-items:center;"><input type="text" id="cert-search" class="search-input" placeholder="Szukaj kursanta..." oninput="renderCertsFiltered()" value="'+searchVal+'" style="flex:1;"><button class="library-btn" onclick="certSortAsc=!certSortAsc;renderCertsFiltered();">A-Z ↕</button></div>';
+    html += '<details class="path-details" style="margin-bottom:10px;"><summary class="path-summary">Ścieżka uprawnień PSAI</summary><img src="sciezka uprawnien PSAI.png" alt="Ścieżka uprawnień PSAI" class="path-image"></details>';
     html += '<div id="cert-student-list">' + sorted.map(function(s) {
       var name = ((s.firstName||'')+ ' '+(s.lastName||'')).trim() || s.name || s.email;
       var rc = s.role==='admin' ? 'rgba(255,180,0,0.12)' : s.role==='instructor' ? 'rgba(228,57,70,0.12)' : 'rgba(41,171,226,0.12)';
