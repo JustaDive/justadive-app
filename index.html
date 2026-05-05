@@ -253,8 +253,8 @@
           <option value="">— Wybierz kurs —</option>
         </select>
       </div>
-      <div class="form-group"><label>Instruktor</label><select id="cf-instructor-sel"></select></div>
-      <div class="form-group"><label>Nr instruktora</label><input type="text" id="cf-instructor-num" disabled style="opacity:0.7;"></div>
+      <div class="form-group"><label>Instruktor</label><select id="cf-instructor-sel" onchange="onInstructorChange()"></select></div>
+      <div class="form-group"><label>Nr instruktora</label><input type="text" id="cf-instructor-num"></div>
       <div class="form-group"><label>Data uzyskania</label><input type="date" id="cf-date"></div>
       <div class="form-group"><label>Numer certyfikatu</label><input type="text" id="cf-number" placeholder="np. OW-12345"></div>
       <div class="form-group full"><label>Uwagi</label><input type="text" id="cf-notes" placeholder="np. OWSD Junior do 12m"></div>

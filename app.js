@@ -685,12 +685,22 @@ async function loadInstructorsForCert() {
   sel.innerHTML = allInstructors.map(function(inst){
     var name = ((inst.firstName||'')+' '+(inst.lastName||'')).trim() || inst.name || inst.email;
     return '<option value="'+inst.uid+'" data-num="'+(inst.certNumber||'')+'">'+name+'</option>';
-  }).join('');
-  sel.onchange = function(){ 
+  }).join('') + '<option value="__other__">— Inny instruktor (wpisz ręcznie) —</option>';
+  sel.onchange = onInstructorChange;
+  onInstructorChange();
+}
+
+function onInstructorChange() {
+  var sel = document.getElementById('cf-instructor-sel');
+  var numField = document.getElementById('cf-instructor-num');
+  if (sel.value === '__other__') {
+    numField.value = '';
+    numField.placeholder = 'Imię Nazwisko #numer';
+  } else {
     var opt = sel.options[sel.selectedIndex];
-    document.getElementById('cf-instructor-num').value = opt?opt.dataset.num||'':'';
-  };
-  if (sel.options.length) sel.onchange();
+    numField.value = opt ? opt.dataset.num || '' : '';
+    numField.placeholder = '';
+  }
 }
 
 function fillCertStudent() {
@@ -719,8 +729,14 @@ async function saveCert() {
   if (!studentUid){showToast('⚠️ Wybierz kursanta');return;}
   var instSel = document.getElementById('cf-instructor-sel');
   var instOpt = instSel.options[instSel.selectedIndex];
-  var instName = instOpt ? instOpt.textContent : '';
-  var instNum = document.getElementById('cf-instructor-num').value;
+  var instNum = document.getElementById('cf-instructor-num').value.trim();
+  var instName;
+  if (instSel.value === '__other__') {
+    instName = instNum;
+    instNum = '';
+  } else {
+    instName = instOpt ? instOpt.textContent : '';
+  }
   // Pobierz zdjęcie kursanta z profilu
   var studentSnap = await db.collection('users').doc(studentUid).get();
   var studentData = studentSnap.data() || {};
