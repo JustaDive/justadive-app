@@ -1244,7 +1244,12 @@ function showResultDetail(idx) {
 
 // ─── Admin: load all users & change roles ───
 async function deleteUser(uid, email) {
-  if (!confirm('Usunąć użytkownika '+email+'? To usunie jego dane z aplikacji.')) return;
+  // Nie można usunąć admina
+  var user = students.find(function(s){ return s.uid === uid; });
+  if (user && user.role === 'admin') { showToast('⚠️ Nie można usunąć admina'); return; }
+  // Potwierdzenie kodem
+  var code = prompt('Aby usunąć '+email+' wpisz USUN:');
+  if (code !== 'USUN') { showToast('⚠️ Anulowano — nieprawidłowy kod'); return; }
   // Usuń certyfikaty
   var certsSnap = await db.collection('users').doc(uid).collection('certs').get();
   certsSnap.forEach(function(doc){ doc.ref.delete(); });
