@@ -801,6 +801,7 @@ async function editCert(id, studentUid) {
   sel.innerHTML = '<option value="'+(studentUid||'')+'">'+( c.name||'')+'</option>';
   var levelSel = document.getElementById('cf-level');
   levelSel.innerHTML = '<option value="'+(c.level||'')+'">'+(c.level||'')+'</option>';
+  await loadInstructorsForCert();
   document.getElementById('cert-modal').classList.add('open');
 }
 
