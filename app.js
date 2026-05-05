@@ -736,9 +736,12 @@ async function saveCert() {
   if (instSel.value === '__other__') {
     instName = instNum;
     instNum = '';
-  } else {
+  } else if (instSel.value && instSel.value !== '') {
     instName = instOpt ? instOpt.textContent : '';
+  } else {
+    instName = '';
   }
+  var instructorField = instName ? instName + (instNum ? ' #'+instNum : '') : '';
   // Pobierz zdjęcie kursanta z profilu
   var studentSnap = await db.collection('users').doc(studentUid).get();
   var studentData = studentSnap.data() || {};
@@ -749,7 +752,7 @@ async function saveCert() {
     number: document.getElementById('cf-number').value.trim(),
     date: document.getElementById('cf-date').value,
     name: (document.getElementById('cf-fname').value + ' ' + document.getElementById('cf-lname').value).trim(),
-    instructor: instName + (instNum ? ' #'+instNum : ''),
+    instructor: instructorField,
     notes: document.getElementById('cf-notes').value.trim(),
     photo: photo,
     studentUid: studentUid
@@ -802,6 +805,17 @@ async function editCert(id, studentUid) {
   var levelSel = document.getElementById('cf-level');
   levelSel.innerHTML = '<option value="'+(c.level||'')+'">'+(c.level||'')+'</option>';
   await loadInstructorsForCert();
+  // Ustaw instruktora z certyfikatu (nie nadpisuj)
+  document.getElementById('cf-instructor-num').value = c.instructor || '';
+  // Spróbuj wybrać instruktora z listy
+  var instSel = document.getElementById('cf-instructor-sel');
+  var found = false;
+  for (var i=0; i<instSel.options.length; i++) {
+    if (c.instructor && c.instructor.indexOf(instSel.options[i].textContent)>=0) {
+      instSel.selectedIndex = i; found = true; break;
+    }
+  }
+  if (!found && c.instructor) { instSel.value = '__other__'; }
   document.getElementById('cert-modal').classList.add('open');
 }
 
