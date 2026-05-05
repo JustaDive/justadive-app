@@ -1340,7 +1340,7 @@ function renderCourses() {
         '<div class="student-email">'+(unlocked?'Odblokowany':'🔒 Zablokowany')+'</div></div>'+
         '<div style="display:flex;gap:6px;align-items:center;">'+
         (isPriv&&!unlocked?'<button class="library-btn" onclick="event.stopPropagation();requestCourse(\''+k+'\',\''+cat.name+'\')">Poproś</button>':'')+
-        (isAdmin&&!unlocked?'<button class="library-btn" onclick="event.stopPropagation();unlockCourseForUser(\''+k+'\')">Odblokuj</button>':'')+
+        (isAdmin?'<button class="library-btn" onclick="event.stopPropagation();unlockCourseForUser(\''+k+'\')">Odblokuj</button>':'')+
         (unlocked?'<div style="color:var(--blue);font-size:0.8rem;">→</div>':'')+
         '</div></div>';
     }).join('');
