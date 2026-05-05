@@ -805,17 +805,29 @@ async function editCert(id, studentUid) {
   var levelSel = document.getElementById('cf-level');
   levelSel.innerHTML = '<option value="'+(c.level||'')+'">'+(c.level||'')+'</option>';
   await loadInstructorsForCert();
-  // Ustaw instruktora z certyfikatu (nie nadpisuj)
-  document.getElementById('cf-instructor-num').value = c.instructor || '';
-  // Spróbuj wybrać instruktora z listy
+  // Ustaw instruktora z certyfikatu
   var instSel = document.getElementById('cf-instructor-sel');
-  var found = false;
-  for (var i=0; i<instSel.options.length; i++) {
-    if (c.instructor && c.instructor.indexOf(instSel.options[i].textContent)>=0) {
-      instSel.selectedIndex = i; found = true; break;
+  var instNumField = document.getElementById('cf-instructor-num');
+  if (c.instructor) {
+    // Spróbuj dopasować do instruktora z listy
+    var matched = false;
+    for (var i=0; i<instSel.options.length; i++) {
+      if (instSel.options[i].value !== '__other__' && c.instructor.indexOf(instSel.options[i].textContent)>=0) {
+        instSel.selectedIndex = i;
+        // Wyciągnij sam numer
+        var numMatch = c.instructor.match(/#(.+)/);
+        instNumField.value = numMatch ? numMatch[1].trim() : '';
+        matched = true;
+        break;
+      }
     }
+    if (!matched) {
+      instSel.value = '__other__';
+      instNumField.value = c.instructor;
+    }
+  } else {
+    instNumField.value = '';
   }
-  if (!found && c.instructor) { instSel.value = '__other__'; }
   document.getElementById('cert-modal').classList.add('open');
 }
 
